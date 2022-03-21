@@ -50,13 +50,13 @@ REGION=$(aws configure get region)
 
 function usage() {
 	# Display Help
-	echo -e "\n${YELLOW}AWS config check script."
+	echo -e "\n${LGREEN}AWS config check script."
 	echo
 	echo "Syntax: aws_check.sh [-h|-v|-V]"
 	echo "options:"
-	echo "-h     Print this Help."
+	echo "h     Print this Help."
 	echo -e "${YELLOW}v     Specify a Network Name (VPC).${LGREEN}"
-	echo -e "-V     Print software version and exit.\n${NC}"
+	echo -e "V     Print software version and exit.\n${NC}"
 }
 
 function my_version() {
