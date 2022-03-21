@@ -1,0 +1,56 @@
+_build
+*/results/*
+results_*.tar*
+
+# This is a minimal list, OK to add things per repo
+# mac specific
+.DS_Store
+.ansible
+.bash_history
+# don't check storage creds into GH
+.boto
+.cache
+#  may contain gcloud files
+.config
+.gitconfig
+.local
+# .netrc contains secrets for service tokens
+.netrc
+*.plan
+.sentinel
+# .ssh dir may contain private keys
+.ssh
+.terrascan
+# Terraform dot files
+.terraform
+.terraformrc
+**/.terraform/*
+.terraform.d
+*.tfstate
+*.tfstate.*
+.vscode
+.idea
+*.dtmp
+
+# Crash log files
+crash.log
+credentials.json
+terraform.rc
+# Auto variables
+*.auto.tfvars
+*.auto.tfvars.json
+
+Makefile
+Makefile.in
+#configure
+config/
+config/install-sh
+config/missing
+aclocal
+aclocal.m4
+autom4te.cache/
+config.status
+config.log
+COPYING
+INSTALL
+libtool
