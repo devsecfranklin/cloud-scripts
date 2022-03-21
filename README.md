@@ -7,6 +7,13 @@ git clone https://github.com/devsecfranklin/cloud-tools.git
 cd cloud-tools
 ```
 
+OPTIONAL: Make the virtual environment to install CLI tool for Azure and Oracle.
+
+```sh
+make python # create the virtual environment
+. _build/bin/activate # activate the virtual environment
+```
+
 ## Azure
 
 Execute the script once for each Resource Group, such as `./az_check.sh -r <RG-Name>`.

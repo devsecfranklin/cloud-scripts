@@ -1,5 +1,10 @@
 .PHONY: aws azure gcp ibm oci
 
+PYTHON := $(shell command -v python3 2> /dev/null)
+ifndef PYTHON
+    PYTHON := $(shell command -v python 2> /dev/null)
+endif
+
 clean:
 	@for trash in */results/*.json */results/*.txt; do\
 		if [ -f $$trash ] || [ -d $$trash ]; then \
@@ -9,9 +14,9 @@ clean:
 	done
 
 python: 
-	@python -m venv _build
+	@$(PYTHON) -m venv _build
 	( \
 		source _build/bin/activate; \
-		python -m pip install --upgrade pip; \
-		python -m pip install -r az/requirements.txt; \
+		_build/bin/python -m pip install --upgrade pip; \
+		_build/bin/python -m pip install -r az/requirements.txt; \
 	)
