@@ -6,7 +6,7 @@ IFS=$'\n\t'
 # ------------------------------------------------------------------
 # Author: Franklin Diaz <fdiaz@paloaltonetowrks.com>
 #
-#     Shell script to gather details about GCP configuration.
+#     Shell script to gather details about GCP configuration. 
 #
 # Repository:
 #
@@ -244,7 +244,7 @@ function save_results() {
 	for PROG in ${ZIP[@]}; do
 		if command -v ${PROG} &>/dev/null; then
 			echo -e "\n${LGREEN}Compressing tar file with ${PROG}${NC}\n"
-			#if [ -f *"results_${MY_DATE}.tar."* ]; then rm results_${MY_DATE}.tar.*; fi
+			if [ -f *"results_${MY_DATE}.tar."* ]; then rm results_${MY_DATE}.tar.*; fi
 			${PROG} -9 ${TARFILE}
 			exit 0
 		else

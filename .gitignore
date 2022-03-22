@@ -1,6 +1,7 @@
 _build
 */results/*
 results_*.tar*
+AzViz
 
 # This is a minimal list, OK to add things per repo
 # mac specific

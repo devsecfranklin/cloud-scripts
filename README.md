@@ -1,5 +1,7 @@
 # cloud-scripts
 
+These scripts are for data gathering on public cloud infrastructure and configuration.
+
 The easiest way to use this is to clone it into a cloud shell and run from there.
 
 ```sh
@@ -7,7 +9,10 @@ git clone https://github.com/devsecfranklin/cloud-tools.git
 cd cloud-tools
 ```
 
-OPTIONAL: Make the virtual environment to install CLI tool for Azure and Oracle.
+OPTIONAL: 
+
+- This optional step in not required in cloud shell
+- Make the Python3.8 (or newer) virtual environment to install CLI tool for Azure and Oracle.
 
 ```sh
 make python # create the virtual environment
@@ -40,6 +45,12 @@ cd gcp
 ./gcp_check.sh -v ps-devsecops-untrust
 ```
 
+Same as previous example, but in a single line:
+
+```sh
+for vpc in ps-devsecops-mgmt ps-devsecops-trust ps-devsecops-untrust; do ./gcp_check.sh -v ${vpc}; done
+```
+
 Upload the compressed TAR file as directed.
 
 ## AWS
@@ -55,4 +66,7 @@ cd aws
 ./aws_check.sh -v ps-devsecops-untrust
 ```
 
-Upload the compressed TAR file as directed.
+## Results
+
+A small set of test and JSON output is generated from the execution of the
+scripts. Upload the compressed TAR file as directed.
