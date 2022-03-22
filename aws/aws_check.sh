@@ -42,7 +42,6 @@ NC='\033[0m' # No Color
 
 # --- Some config Variables ----------------------------------------
 MY_DATE=$(date '+%Y-%m-%d-%H')
-OUTPUT="results/aws_check_results_${MY_DATE}.txt"
 RAW_OUTPUT="results/aws_check_raw_output_${MY_DATE}.txt"
 REPORT="results/aws_check_report_${MY_DATE}.txt"
 
@@ -71,40 +70,60 @@ function delete_output_file() {
 }
 
 function get_tgw() {
+	OUTPUT="results/tgw_${MY_DATE}.txt"
+	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS TGW Details --------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	aws ec2 describe-transit-gateways | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 	aws ec2 describe-transit-gateway-vpc-attachments | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
-
 }
 
 function get_tgw_rt() {
-	# separated this out to loop over TGW list
+	OUTPUT="results/tgw_route_tables_${MY_DATE}.txt"
+	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS TGW RT Details -----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	aws ec2 describe-transit-gateway-route-tables | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_lb() {
+	OUTPUT="results/load_balancers_${MY_DATE}.txt"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS LB Details ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	aws elb describe-load-balancers | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_lb_target_grps() {
-	aws elbv2 describe-target-groups
+	OUTPUT="results/target_groups_${MY_DATE}.txt"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS TGT GRP Details ----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	aws elbv2 describe-target-groups | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_sg() {
-	aws ec2 describe-security-groups
+	OUTPUT="results/security_groups_${MY_DATE}.txt"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS SG Details ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	aws ec2 describe-security-groups | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_instances() {
-	aws ec2 describe-instances
+	OUTPUT="results/instances_${MY_DATE}.txt"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS Instance Details ---------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	aws ec2 describe-instances | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_interfaces() {
-	aws ec2 describe-network-interfaces
+	OUTPUT="results/interfaces_${MY_DATE}.txt"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS Interface Details ---------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	aws ec2 describe-network-interfaces | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_eip() {
-	aws ec2 describe-addresses
+	OUTPUT="results/elasitc_ip_${MY_DATE}.txt"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS EIP Details ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	aws ec2 describe-addresses | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function save_results() {

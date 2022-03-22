@@ -7,7 +7,10 @@ git clone https://github.com/devsecfranklin/cloud-tools.git
 cd cloud-tools
 ```
 
-OPTIONAL: Make the virtual environment to install CLI tool for Azure and Oracle.
+OPTIONAL: 
+
+- This optional step in not required in cloud shell
+- Make the Python3.8 (or newer) virtual environment to install CLI tool for Azure and Oracle.
 
 ```sh
 make python # create the virtual environment
@@ -38,6 +41,12 @@ cd gcp
 ./gcp_check.sh -v ps-devsecops-mgmt
 ./gcp_check.sh -v ps-devsecops-trust
 ./gcp_check.sh -v ps-devsecops-untrust
+```
+
+Same as previous example, but in a single line:
+
+```sh
+for vpc in ps-devsecops-mgmt ps-devsecops-trust ps-devsecops-untrust; do ./gcp_check.sh -v ${vpc}; done
 ```
 
 Upload the compressed TAR file as directed.
