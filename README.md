@@ -1,5 +1,7 @@
 # cloud-scripts
 
+These scripts are for data gathering on public cloud infrastructure and configuration.
+
 The easiest way to use this is to clone it into a cloud shell and run from there.
 
 ```sh
@@ -64,4 +66,7 @@ cd aws
 ./aws_check.sh -v ps-devsecops-untrust
 ```
 
-Upload the compressed TAR file as directed.
+## Results
+
+A small set of test and JSON output is generated from the execution of the
+scripts. Upload the compressed TAR file as directed.

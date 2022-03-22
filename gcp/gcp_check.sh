@@ -6,7 +6,7 @@ IFS=$'\n\t'
 # ------------------------------------------------------------------
 # Author: Franklin Diaz <fdiaz@paloaltonetowrks.com>
 #
-#     Shell script to gather details about GCP configuration.
+#     Shell script to gather details about GCP configuration. 
 #
 # Repository:
 #
