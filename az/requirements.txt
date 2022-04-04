@@ -1,4 +1,4 @@
-cryptography==3.3.2
+cryptography==36.0.2
 #cryptography>=3.4.6
 requests[socks]==2.25.1
 azure-cli
