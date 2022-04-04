@@ -9,16 +9,6 @@ git clone https://github.com/devsecfranklin/cloud-tools.git
 cd cloud-tools
 ```
 
-OPTIONAL: 
-
-- This optional step in not required in cloud shell
-- Make the Python3.8 (or newer) virtual environment to install CLI tool for Azure and Oracle.
-
-```sh
-make python # create the virtual environment
-. _build/bin/activate # activate the virtual environment
-```
-
 ## Azure
 
 Execute the script once for each Resource Group, such as `./az_check.sh -r <RG-Name>`.
@@ -48,7 +38,8 @@ cd gcp
 Same as previous example, but in a single line:
 
 ```sh
-for vpc in ps-devsecops-mgmt ps-devsecops-trust ps-devsecops-untrust; do ./gcp_check.sh -v ${vpc}; done
+for vpc in ps-devsecops-mgmt ps-devsecops-trust ps-devsecops-untrust; do \
+    ./gcp_check.sh -v ${vpc}; done
 ```
 
 Upload the compressed TAR file as directed.
@@ -64,6 +55,13 @@ cd aws
 ./aws_check.sh -v ps-devsecops-mgmt
 ./aws_check.sh -v ps-devsecops-trust
 ./aws_check.sh -v ps-devsecops-untrust
+```
+
+Same as previous example, but in a single line:
+
+```sh
+for vpc in ps-devsecops-mgmt ps-devsecops-trust ps-devsecops-untrust; do \
+    ./aws_check.sh -v ${vpc}; done
 ```
 
 ## Results
