@@ -292,11 +292,11 @@ function save_results() {
 
 # --- The main() function ----------------------------------------
 function main() {
-	#if [ ! -d "results" ]; then
-	#	mkdir results
-	#else
-	#	delete_output_file
-	#fi
+	if [ ! -d "results" ]; then
+		mkdir results
+	else
+		delete_output_file
+	fi
 	echo -e "${LCYAN}# --- az_check.sh -------------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	my_version | tee -a ${RAW_OUTPUT}
 	get_rg    # get the resource group
