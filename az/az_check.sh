@@ -52,10 +52,10 @@ function usage() {
 	# Display Help
 	echo -e "\n${LGREEN}Azure config check script."
 	echo
-	echo "Syntax: az_check.sh [-h|-v|-V]"
+	echo "Syntax: az_check.sh [-h|-r|-V]"
 	echo "options:"
 	echo "-h     Print this Help."
-	echo -e "${YELLOW}v     Specify a Network Name (VNet).${LGREEN}"
+	echo -e "${YELLOW}-r     Specify a Resource Group (RG).${LGREEN}"
 	echo -e "-V     Print software version and exit.\n${NC}"
 }
 
