@@ -1,7 +1,7 @@
 #!/bin/bash
 
-set -euo # pipefail
-IFS=$'\n\t'
+#set -euo # pipefail
+#IFS=$'\n\t'
 
 # ------------------------------------------------------------------
 # Author: Franklin Diaz <fdiaz@paloaltonetowrks.com>
