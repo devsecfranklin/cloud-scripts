@@ -1,7 +1,11 @@
 _build
 */results/*
+report/report/*
 results_*.tar*
 AzViz
+report.log
+
+__pycache__
 
 # This is a minimal list, OK to add things per repo
 # mac specific
@@ -43,7 +47,7 @@ terraform.rc
 
 Makefile
 Makefile.in
-#configure
+configure~
 config/
 config/install-sh
 config/missing
@@ -55,3 +59,25 @@ config.log
 COPYING
 INSTALL
 libtool
+
+*.aux
+*.bbl
+*.blg
+*.err
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.log
+*.lot
+*.lua
+*.nav
+*.out
+*.pyg
+*.snm
+*.synctex.gz
+*.toc
+*.verbatim
+core

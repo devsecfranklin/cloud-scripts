@@ -4,7 +4,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 # ------------------------------------------------------------------
-# Author: Franklin Diaz <fdiaz@paloaltonetowrks.com>
+# Author: Franklin Diaz <fdiaz@paloaltonetworks.com>
 #
 #     Shell script to gather details about AWS configuration.
 #
@@ -59,7 +59,8 @@ function usage() {
 }
 
 function my_version() {
-	echo -e "${LGREEN}aws_check.sh - version 0.1 - fdiaz@paloaltonetwoks.com${NC}"
+	echo -e "${LGREEN}aws_check.sh - version 0.1 - fdiaz@paloaltonetworks.com${NC}"
+	
 }
 
 function delete_output_file() {
@@ -70,7 +71,7 @@ function delete_output_file() {
 }
 
 function get_tgw() {
-	OUTPUT="results/tgw_${MY_DATE}.txt"
+	OUTPUT="results/tgw_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS TGW Details --------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	aws ec2 describe-transit-gateways | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
@@ -78,57 +79,57 @@ function get_tgw() {
 }
 
 function get_tgw_rt() {
-	OUTPUT="results/tgw_route_tables_${MY_DATE}.txt"
+	OUTPUT="results/tgw_route_tables_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS TGW RT Details -----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	aws ec2 describe-transit-gateway-route-tables | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+	aws ec2 describe-transit-gateway-route-tables --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_lb() {
-	OUTPUT="results/load_balancers_${MY_DATE}.txt"
+	OUTPUT="results/load_balancers_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS LB Details ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	aws elb describe-load-balancers | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+	aws elb describe-load-balancers --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_lb_target_grps() {
-	OUTPUT="results/target_groups_${MY_DATE}.txt"
+	OUTPUT="results/target_groups_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS TGT GRP Details ----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	aws elbv2 describe-target-groups | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+	aws elbv2 describe-target-groups --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_sg() {
-	OUTPUT="results/security_groups_${MY_DATE}.txt"
+	OUTPUT="results/security_groups_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS SG Details ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	aws ec2 describe-security-groups | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_instances() {
-	OUTPUT="results/instances_${MY_DATE}.txt"
+	OUTPUT="results/instances_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS Instance Details ---------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	aws ec2 describe-instances | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+	aws ec2 describe-instances --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_interfaces() {
-	OUTPUT="results/interfaces_${MY_DATE}.txt"
+	OUTPUT="results/interfaces_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS Interface Details ---------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	aws ec2 describe-network-interfaces | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+	aws ec2 describe-network-interfaces --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_eip() {
-	OUTPUT="results/elasitc_ip_${MY_DATE}.txt"
+	OUTPUT="results/elasitc_ip_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS EIP Details ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	aws ec2 describe-addresses | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+	aws ec2 describe-addresses --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function save_results() {
 	echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	TARFILE="results_${MY_DATE}.tar"
+	TARFILE="results/results_${MY_DATE}.tar"
 	tar cvf ${TARFILE} results/*_${MY_DATE}.txt
 	ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
 	for PROG in ${ZIP[@]}; do
@@ -145,10 +146,11 @@ function save_results() {
 
 # --- The main() function ----------------------------------------
 function main() {
-	if [ ! -d "results" ]; then mkdir results; fi
-	delete_output_file
+	#if [ ! -d "results" ]; then mkdir results; fi
+	#delete_output_file
 	echo -e "${LCYAN}# --- aws_check.sh --- ${YELLOW}REGION: ${REGION} ${LCYAN}---------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	my_version | tee -a ${RAW_OUTPUT}
+	aws ec2 describe-availability-zones --output text --query 'AvailabilityZones[0].[RegionName]' | tee -a ${RAW_OUTPUT}
 
 	# Networking
 	get_tgw
