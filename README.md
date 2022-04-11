@@ -46,9 +46,9 @@ Upload the compressed TAR file as directed.
 
 ## AWS
 
-Execute the script once for each VPC (such as mgmt, trust, and untrust).
+Execute the script once for each VPC.
 
-Example: 
+Example:
 
 ```sh
 cd aws
@@ -62,6 +62,16 @@ Same as previous example, but in a single line:
 ```sh
 for vpc in ps-devsecops-mgmt ps-devsecops-trust ps-devsecops-untrust; do \
     ./aws_check.sh -v ${vpc}; done
+```
+
+## OCI
+
+Execute the script once for each Compartment.
+
+Example:
+
+```sh
+./oci_check.sh -c ocid1.compartment.oc1..aaaaaaaa123412341234asdfasdf
 ```
 
 ## Results

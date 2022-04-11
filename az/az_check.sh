@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eo # pipefail
+#set -eo # pipefail
 IFS=$'\n\t'
 
 # ------------------------------------------------------------------
@@ -50,12 +50,12 @@ declare -a SECURITY_GROUPS
 
 function usage() {
 	# Display Help
-	echo -e "\n${YELLOW}Azure config check script."
+	echo -e "\n${LGREEN}Azure config check script."
 	echo
-	echo "Syntax: az_check.sh [-h|-v|-V]"
+	echo "Syntax: az_check.sh [-h|-r|-V]"
 	echo "options:"
 	echo "-h     Print this Help."
-	echo -e "${YELLOW}v     Specify a Network Name (VNet).${LGREEN}"
+	echo -e "${YELLOW}-r     Specify a Resource Group (RG).${LGREEN}"
 	echo -e "-V     Print software version and exit.\n${NC}"
 }
 
@@ -206,6 +206,7 @@ function get_network_int() {
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect Azure Network Interfaces ----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	az network nic list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+	az network nic list-effective-nsg 
 }
 
 function get_local_network_gw() {
@@ -213,7 +214,6 @@ function get_local_network_gw() {
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect Azure Local Network Gateways -------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	az network local-gateway list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
-
 }
 
 function get_public_ips() {
