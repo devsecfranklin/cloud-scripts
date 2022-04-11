@@ -1,10 +1,10 @@
 #!/bin/bash
 
-#set -eo # pipefail
+set -eo # pipefail
 IFS=$'\n\t'
 
 # ------------------------------------------------------------------
-# Author: Franklin Diaz <fdiaz@paloaltonetowrks.com>
+# Author: Franklin Diaz <fdiaz@paloaltonetworks.com>
 #
 #     Shell script to gather details about Azure configuration.
 #
@@ -50,12 +50,12 @@ declare -a SECURITY_GROUPS
 
 function usage() {
 	# Display Help
-	echo -e "\n${LGREEN}Azure config check script."
+	echo -e "\n${YELLOW}Azure config check script."
 	echo
-	echo "Syntax: az_check.sh [-h|-r|-V]"
+	echo "Syntax: az_check.sh [-h|-v|-V]"
 	echo "options:"
 	echo "-h     Print this Help."
-	echo -e "${YELLOW}-r     Specify a Resource Group (RG).${LGREEN}"
+	echo -e "${YELLOW}v     Specify a Network Name (VNet).${LGREEN}"
 	echo -e "-V     Print software version and exit.\n${NC}"
 }
 
