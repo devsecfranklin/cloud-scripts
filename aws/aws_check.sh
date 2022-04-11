@@ -1,10 +1,10 @@
 #!/bin/bash
 
-#set -euo pipefail
-#IFS=$'\n\t'
+set -euo pipefail
+IFS=$'\n\t'
 
 # ------------------------------------------------------------------
-# Author: Franklin Diaz <fdiaz@paloaltonetowrks.com>
+# Author: Franklin Diaz <fdiaz@paloaltonetworks.com>
 #
 #     Shell script to gather details about AWS configuration.
 #
@@ -59,7 +59,7 @@ function usage() {
 }
 
 function my_version() {
-	echo -e "${LGREEN}aws_check.sh - version 0.1 - fdiaz@paloaltonetwoks.com${NC}"
+	echo -e "${LGREEN}aws_check.sh - version 0.1 - fdiaz@paloaltonetworks.com${NC}"
 	
 }
 
