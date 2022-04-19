@@ -264,7 +264,7 @@ function get_log_an_ws() {
 	OUTPUT="results/az_log_analytics_workspaces_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect Azure Log Analytics Workspaces ------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az monitor log-analytics workspace list --resource-group -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+	az monitor log-analytics workspace list --resource-group "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_policies() {
@@ -311,7 +311,8 @@ function main() {
 	get_lbs
 	get_vms
 	get_network_int
-	get_log_an_ws # log analytics workspaces
+	# next one is complaining "(--resource-group --name | --ids) are required"
+	#get_log_an_ws # log analytics workspaces
 
 	save_results
 }

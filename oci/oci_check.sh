@@ -70,6 +70,7 @@ function get_drg() {
 	echo -e "${LCYAN}\n# --- Collect Oracle DRG Details ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	OUTPUT="results/oci_drg_${MY_DATE}.txt"
 	oci network drg list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
+	cat  | grep \""id\"" | cut -f4 -d"\""
 }
 
 function get_drg_attach() {
