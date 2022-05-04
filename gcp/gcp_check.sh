@@ -78,7 +78,7 @@ function delete_output_file() {
 # and security into and out of an application project, and a second set of administrators to control the
 # application project resources. (Similar to RG in Azure, not as easy to manage?)
 function get_all_vpc() {
-	OUTPUT="results/all_vpc_${MY_DATE}.json"
+	OUTPUT="results/gcp_all_vpc_${MY_DATE}.json"
 	delete_output_file
 	printf "\n# --- GCP Collect VPC Names --------------------------------------\n" | tee -a ${RAW_OUTPUT}
 	gcloud compute networks list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
@@ -93,14 +93,14 @@ function get_all_vpc() {
 # default-allow-rdp: Allows ingress connections on TCP port 3389(RDP) from any source to any instance in the network.
 # default-allow-icmp: Allows ingress ICMP traffic from any source to any instance in the network.
 function get_default_network() {
-	OUTPUT="results/default_network_${MY_DATE}.json"
+	OUTPUT="results/gcp_default_network_${MY_DATE}.json"
 	delete_output_file
 	printf "\n# --- GCP Check Default Networks ---------------------------------\n" | tee -a ${RAW_OUTPUT}
 	gcloud compute networks describe default --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function get_subnets() {
-	OUTPUT="results/subnets_${VPC}_${MY_DATE}.json"
+	OUTPUT="results/gcp_subnets_${VPC}_${MY_DATE}.json"
 	delete_output_file
 	printf "\n# --- GCP Network Details ----------------------------------------\n" | tee -a ${RAW_OUTPUT}
 	gcloud compute networks describe ${VPC} --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
@@ -122,7 +122,7 @@ function get_subnets() {
 #
 # GCP sends HTTP health checks from the IP ranges 209.85.152.0/22, 209.85.204.0/22, and 35.191.0.0/16
 function get_firewall_rules() {
-	OUTPUT="results/firewall_rules_${VPC}_${MY_DATE}.json"
+	OUTPUT="results/gcp_firewall_rules_${VPC}_${MY_DATE}.json"
 	delete_output_file
 	printf "\n# --- GCP Firewall Rules -----------------------------------------\n" | tee -a ${RAW_OUTPUT}
 	gcloud compute firewall-rules list --filter="network:${VPC}" --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
@@ -136,7 +136,7 @@ function get_firewall_rules() {
 #
 # GCP prefers higher priority routes, and if more than one route has the highest priority, GCP load shares traffic between the routes.
 function get_routes() {
-	OUTPUT="results/routes_${VPC}_${MY_DATE}.json"
+	OUTPUT="results/gcp_routes_${VPC}_${MY_DATE}.json"
 	delete_output_file
 	printf "\n# --- GCP Route Details ------------------------------------------\n" | tee -a ${RAW_OUTPUT}
 	gcloud compute routes list --filter="network:${VPC}" --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
@@ -144,7 +144,7 @@ function get_routes() {
 
 # This is part of the internal network load balancer configuration
 function get_instance_groups {
-	OUTPUT="results/instance_groups_${VPC}_${MY_DATE}.json"
+	OUTPUT="results/gcp_instance_groups_${VPC}_${MY_DATE}.json"
 	delete_output_file
 	printf "\n# --- GCP Instance Groups ----------------------------------------\n" | tee -a ${RAW_OUTPUT}
 	gcloud compute instance-groups list --filter="network:${VPC}" --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
@@ -154,7 +154,7 @@ function get_instance_groups {
 
 # This is part of the internal network load balancer configuration
 function get_health_checks {
-	OUTPUT="results/health_checks_${MY_DATE}.json"
+	OUTPUT="results/gcp_health_checks_${MY_DATE}.json"
 	delete_output_file
 	printf "\n# --- GCP Health Checks ------------------------------------------\n" | tee -a ${RAW_OUTPUT}
 	gcloud compute http-health-checks list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
@@ -163,14 +163,14 @@ function get_health_checks {
 # This is part of the internal network load balancer configuration
 function get_backend() {
 	# A regional backend service that monitors the usage and health of backends.
-	OUTPUT="results/backend_services_${MY_DATE}.json"
+	OUTPUT="results/gcp_backend_services_${MY_DATE}.json"
 	delete_output_file
 	printf "\n# --- GCP Backend Services ---------------------------------------\n" | tee -a ${RAW_OUTPUT}
 	gcloud compute backend-services list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function get_url_maps() {
-	OUTPUT="results/url_maps_${MY_DATE}.json"
+	OUTPUT="results/gcp_url_maps_${MY_DATE}.json"
 	delete_output_file
 	printf "\n# --- GCP URL Maps -----------------------------------------------\n" | tee -a ${RAW_OUTPUT}
 	gcloud compute url-maps list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
@@ -180,23 +180,23 @@ function get_url_maps() {
 # Collect some more ILB details
 function get_internal_lb() {
 	printf "\n# --- GCP Target HTTP Proxies ------------------------------------\n" | tee -a ${RAW_OUTPUT}
-	OUTPUT="results/target_proxies_list_${MY_DATE}.json"
+	OUTPUT="results/gcp_target_proxies_list_${MY_DATE}.json"
 	delete_output_file
 	gcloud compute target-http-proxies list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 
 	printf "\n# --- GCP Target HTTPS Proxies -----------------------------------\n" | tee -a ${RAW_OUTPUT}
-	OUTPUT="results/https_proxies_${MY_DATE}.json"
+	OUTPUT="results/gcp_https_proxies_${MY_DATE}.json"
 	delete_output_file
 	gcloud compute target-https-proxies list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 
 	printf "\n# --- GCP Security Policies -----------------------------------\n" | tee -a ${RAW_OUTPUT}
-	OUTPUT="results/security_policies_${MY_DATE}.json"
+	OUTPUT="results/gcp_security_policies_${MY_DATE}.json"
 	delete_output_file
 	gcloud compute security-policies list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function get_ssl_certs() {
-	OUTPUT="results/ssl_certificates_${MY_DATE}.json"
+	OUTPUT="results/gcp_ssl_certificates_${MY_DATE}.json"
 	delete_output_file
 	printf "\n# --- GCP SSL Certificates ---------------------------------------\n" | tee -a ${RAW_OUTPUT}
 	gcloud compute ssl-certificates list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
@@ -204,7 +204,7 @@ function get_ssl_certs() {
 
 # This is part of the internal network load balancer configuration
 function get_fwd_rules() {
-	OUTPUT="results/forwarding_rules_${MY_DATE}.json"
+	OUTPUT="results/gcp_forwarding_rules_${MY_DATE}.json"
 	delete_output_file
 	printf "\n# --- GCP Forwarding Rules --------------------------------------\n" | tee -a ${RAW_OUTPUT}
 	gcloud compute forwarding-rules list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
@@ -219,7 +219,7 @@ function get_fwd_rules() {
 # the peering setup to import or export them. VPC network peers learn routing information dynamically
 #from their peered networks.
 function get_peerings() {
-	OUTPUT="results/peerings_${MY_DATE}.json"
+	OUTPUT="results/gcp_peerings_${MY_DATE}.json"
 	delete_output_file
 	printf "\n# --- GCP VPC Peerings ------------------------------------------\n" | tee -a ${RAW_OUTPUT}
 	gcloud compute networks peerings list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
@@ -230,7 +230,7 @@ function get_peerings() {
 # multiple tunnels to a single location for deployments with resilient on-premises VPN devices. Active/
 # active configuration is also possible if you deploy multiple Cloud VPN gateways.
 function get_vpn_gw() {
-	OUTPUT="results/vpn_gw_${MY_DATE}.json"
+	OUTPUT="results/gcp_vpn_gw_${MY_DATE}.json"
 	delete_output_file
 	printf "\n# --- GCP VPC Peerings ------------------------------------------\n" | tee -a ${RAW_OUTPUT}
 	gcloud compute vpn-gateways list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
