@@ -1,7 +1,11 @@
 _build
-*/results/*
+report/results/*.json
+report/results/*.txt
+report/results/*.tar
+report/results/*.tar.xz
 report/report/*
 results_*.tar*
+tests/results/*.json
 AzViz
 report.log
 

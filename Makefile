@@ -6,17 +6,10 @@ ifndef PYTHON
 endif
 
 clean:
-	@for trash in */results/*.json */results/*.txt; do\
+	@for trash in report/results/*.json report/results/*.txt report/results/*.tar report/results/*.tar.xz; do\
 		if [ -f $$trash ] || [ -d $$trash ]; then \
 			echo "Removing $$trash" ;\
 			rm -rf $$trash ;\
 		fi ; \
 	done
 
-python: 
-	@$(PYTHON) -m venv _build
-	( \
-		source _build/bin/activate; \
-		_build/bin/python -m pip install --upgrade pip; \
-		_build/bin/python -m pip install -r az/requirements.txt; \
-	)
