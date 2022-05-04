@@ -277,7 +277,7 @@ function get_policies() {
 function save_results() {
 	echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	TARFILE="results/results_${MY_DATE}.tar"
-	tar cvf ${TARFILE} results/*
+	tar cvf ${TARFILE} results/*.json results/*.txt
 	ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
 	for PROG in ${ZIP[@]}; do
 		if command -v ${PROG} &>/dev/null; then
