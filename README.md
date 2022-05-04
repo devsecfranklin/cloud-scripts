@@ -1,5 +1,7 @@
 # cloud-scripts
 
+[![Bandit Python Security Check](https://github.com/devsecfranklin/cloud-tools/actions/workflows/bandit.yml/badge.svg)](https://github.com/devsecfranklin/cloud-tools/actions/workflows/bandit.yml)
+
 These scripts are for data gathering on public cloud infrastructure and configuration.
 
 The easiest way to use this is to clone it into a cloud shell and run from there.

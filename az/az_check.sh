@@ -78,7 +78,7 @@ function delete_output_file() {
 # with each other is possible because resource groups do not control communication between resources.
 
 function get_rg() {
-	OUTPUT="results/resource_group_${RESOURCE_GROUP}_${MY_DATE}.json"
+	OUTPUT="results/az_resource_group_${RESOURCE_GROUP}_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect Azure Network Details --------------------------\n${NC}" | tee "${RAW_OUTPUT}"
 	az group show -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"

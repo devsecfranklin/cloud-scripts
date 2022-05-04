@@ -47,6 +47,7 @@ terraform.rc
 
 Makefile
 Makefile.in
+configure
 configure~
 config/
 config/install-sh

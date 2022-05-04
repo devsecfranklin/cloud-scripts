@@ -71,7 +71,7 @@ function delete_output_file() {
 }
 
 function get_tgw() {
-	OUTPUT="results/tgw_${MY_DATE}.json"
+	OUTPUT="results/aws_tgw_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS TGW Details --------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	aws ec2 describe-transit-gateways | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
@@ -79,49 +79,49 @@ function get_tgw() {
 }
 
 function get_tgw_rt() {
-	OUTPUT="results/tgw_route_tables_${MY_DATE}.json"
+	OUTPUT="results/aws_tgw_route_tables_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS TGW RT Details -----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	aws ec2 describe-transit-gateway-route-tables --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_lb() {
-	OUTPUT="results/load_balancers_${MY_DATE}.json"
+	OUTPUT="results/aws_load_balancers_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS LB Details ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	aws elb describe-load-balancers --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_lb_target_grps() {
-	OUTPUT="results/target_groups_${MY_DATE}.json"
+	OUTPUT="results/aws_target_groups_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS TGT GRP Details ----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	aws elbv2 describe-target-groups --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_sg() {
-	OUTPUT="results/security_groups_${MY_DATE}.json"
+	OUTPUT="results/aws_security_groups_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS SG Details ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	aws ec2 describe-security-groups | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_instances() {
-	OUTPUT="results/instances_${MY_DATE}.json"
+	OUTPUT="results/aws_instances_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS Instance Details ---------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	aws ec2 describe-instances --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_interfaces() {
-	OUTPUT="results/interfaces_${MY_DATE}.json"
+	OUTPUT="results/aws_interfaces_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS Interface Details ---------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	aws ec2 describe-network-interfaces --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_eip() {
-	OUTPUT="results/elasitc_ip_${MY_DATE}.json"
+	OUTPUT="results/aws_elasitc_ip_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS EIP Details ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	aws ec2 describe-addresses --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
