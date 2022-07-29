@@ -12,13 +12,9 @@
 #
 #     https://github.com/devsecfranklin/cloud-scripts
 #
-# Example:
+# Be sure to install the plug in tools:
 #
-#     Run the script twice on two different VPC. Results are captured
-#     to a single log file with today's date.
-#
-#     ./ibm_check.sh -v ti-ai-network-host
-#     ./ibm_check.sh -v ti-ai-outside
+#     ibmcloud plugin install vpc-infrastructure
 #
 # ------------------------------------------------------------------
 
@@ -90,22 +86,44 @@ function get_hardware() {
 
 # --- The main() function ----------------------------------------
 function main() {
-	echo -e "${LCYAN}# --- ibm_check.sh --- ${YELLOW}REGION: ${REGION} ${LCYAN}---------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	echo -e "${LCYAN}# --- ibm_check.sh ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	my_version | tee -a ${RAW_OUTPUT}
 
+    ibmcloud is regions --output json
     ibmcloud resource groups --output json
+    # ibmcloud is vpcs
     ibmcloud resource tags --output json
-    get_subnets
-    ibmcloud sl firewall list --output json
-    ibmcloud sl securitygroup list --output json
     ibmcloud sl dns zone-list --output json
     ibmcloud sl globalip list --output json
-    ibmcloud sl vlan list --output json
     ibmcloud sl autoscale list --output json
+    ibmcloud is public-gateways --output json
+    ibmcloud is endpoint-gateways --output json
+
+    # access
+    ibmcloud sl firewall list --output json
+    ibmcloud sl securitygroup list --output json
+    ibmcloud is security-groups --output json
+    ibmcloud is network-acls --output json
+
+    # storage
     ibmcloud sl block object-list --output json
     ibmcloud sl block volume-list --output json
     ibmcloud sl file volume-list --output json
+    ibmcloud is volumes --output json
+
+    # hardware
     get_hardware
+    ibmcloud is instances --output json
+    ibmcloud is bare-metal-servers --output json
+    ibmcloud is dedicated-hosts --output json
+
+    # network infra
+    ibmcloud is lbs # load balancers
+    get_subnets
+    ibmcloud sl vlan list --output json
+    ibmcloud is vpns --output json # VPN Gateways
+    ibmcloud is vpn-servers --output json # VPN Server
+
     save_results
 }
 
