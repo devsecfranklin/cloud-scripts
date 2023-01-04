@@ -4,7 +4,7 @@
 #IFS=$'\n\t'
 
 # ------------------------------------------------------------------
-# Author: Franklin Diaz <fdiaz@paloaltonetowrks.com>
+# Author: Franklin D <devsecfranklin@duck.com>
 #
 #     Shell script to gather details about GCP configuration.
 #
@@ -82,6 +82,13 @@ function get_all_vpc() {
   delete_output_file
   printf "\n# --- GCP Collect VPC Names --------------------------------------\n" | tee -a ${RAW_OUTPUT}
   gcloud compute networks list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
+}
+
+function get_this_vpc(){
+  OUTPUT="results/gcp_default_network_${MY_DATE}.json"
+  delete_output_file
+  printf "\n# --- GCP Check VPC: ${VPC} --------------------------------------------\n" | tee -a ${RAW_OUTPUT}
+  gcloud compute networks describe  ${VPC} --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 # https://docs.bridgecrew.io/docs/bc_gcp_networking_7
