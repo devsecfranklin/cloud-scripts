@@ -4,7 +4,7 @@
 #IFS=$'\n\t'
 
 # ------------------------------------------------------------------
-# Author: Franklin Diaz <fdiaz@paloaltonetworks.com>
+# Author: Franklin D <devsecfranklin@duck.com>
 #
 #     Shell script to gather details about Oracle Cloud configuration.
 #

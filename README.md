@@ -13,9 +13,15 @@ cd cloud-tools
 
 ## Azure
 
-Execute the script once for each Resource Group, such as `./az_check.sh -r <RG-Name>`.
+Download the script to your cloud shell in Azure.
 
-Example:
+```sh
+wget -O az_check.sh https://raw.githubusercontent.com/devsecfranklin/cloud-scripts/main/az/az_check.sh
+chmod 755 az_check.sh
+```
+
+
+Execute the script once for each Resource Group, such as `./az_check.sh -r <RG-Name>`.
 
 ```sh
 cd az
@@ -26,9 +32,14 @@ Upload the compressed TAR file as directed.
 
 ## Google Cloud
 
-Execute the script once for each VPC (such as mgmt, trust, and untrust).
+Download the script to your cloud shell in GCP.
 
-Example: 
+```sh
+wget -O gcp_check.sh https://raw.githubusercontent.com/devsecfranklin/cloud-scripts/main/gcp/gcp_check.sh
+chmod 755 gcp_check.sh
+```
+
+Execute the script once for each VPC (such as mgmt, trust, and untrust).
 
 ```sh
 cd gcp
@@ -48,9 +59,14 @@ Upload the compressed TAR file as directed.
 
 ## AWS
 
-Execute the script once for each VPC.
+Download the script to your cloud shell in AWS.
 
-Example:
+```sh
+wget -O aws_check.sh https://raw.githubusercontent.com/devsecfranklin/cloud-scripts/main/aws/aws_check.sh
+chmod 755 aws_check.sh
+```
+
+Execute the script once for each VPC.
 
 ```sh
 cd aws
