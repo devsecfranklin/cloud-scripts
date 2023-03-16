@@ -78,6 +78,7 @@ cd aws
 Same as previous example, but in a single line:
 
 ```sh
+cd aws
 for vpc in ps-devsecops-mgmt ps-devsecops-trust ps-devsecops-untrust; do \
     ./aws_check.sh -v ${vpc}; done
 ```
@@ -89,6 +90,7 @@ Execute the script once for each Compartment.
 Example:
 
 ```sh
+cd oci
 ./oci_check.sh -c ocid1.compartment.oc1..aaaaaaaa123412341234asdfasdf
 ```
 
@@ -96,3 +98,5 @@ Example:
 
 A small set of test and JSON output is generated from the execution of the
 scripts. Upload the compressed TAR file as directed.
+
+## OpenShift
