@@ -1,4 +1,4 @@
- # Azure
+# Azure
 
 ## Install
 
@@ -9,4 +9,3 @@ wget -O az_check.sh https://raw.githubusercontent.com/devsecfranklin/cloud-scrip
 chmod 755 az_check.sh
 ./az_check.sh -r RG01-GRID # example resource group
 ```
-
