@@ -20,7 +20,6 @@ wget -O az_check.sh https://raw.githubusercontent.com/devsecfranklin/cloud-scrip
 chmod 755 az_check.sh
 ```
 
-
 Execute the script once for each Resource Group, such as `./az_check.sh -r <RG-Name>`.
 
 ```sh
