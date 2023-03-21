@@ -63,7 +63,7 @@ function usage() {
 }
 
 function my_version() {
-  echo -e "${LGREEN}gcp_check.sh - version 0.1 - fdiaz@paloaltonetwoks.com${NC}"
+  echo -e "${LGREEN}gcp_check.sh - version 0.2 - fdiaz@paloaltonetwoks.com${NC}"
 }
 
 function delete_output_file() {
@@ -73,19 +73,27 @@ function delete_output_file() {
   fi
 }
 
+# get the projects names that are visible
+function get_projects() {
+  OUTPUT="results/gcp_projects_${GCP_PROJECT}_${MY_DATE}.json"
+  delete_output_file
+  printf "\n# --- GCP Collect Project Names ----------------------------------\n" | tee -a ${RAW_OUTPUT}
+  gcloud projects list --format=json  | tee -a ${OUTPUT} ${RAW_OUTPUT}
+}
+
 # Shared VPC allows one project to share its VPC networks with one or more projects. Shared VPC is useful
 # in situations where you want one set of administrators to control the networks, traffic forwarding,
 # and security into and out of an application project, and a second set of administrators to control the
 # application project resources. (Similar to RG in Azure, not as easy to manage?)
 function get_all_vpc() {
-  OUTPUT="results/gcp_all_vpc_${MY_DATE}.json"
+  OUTPUT="results/gcp_all_vpc_${GCP_PROJECT}_${MY_DATE}.json"
   delete_output_file
   printf "\n# --- GCP Collect VPC Names --------------------------------------\n" | tee -a ${RAW_OUTPUT}
   gcloud compute networks list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function get_this_vpc(){
-  OUTPUT="results/gcp_default_network_${MY_DATE}.json"
+  OUTPUT="results/gcp_${VPC}_network_${MY_DATE}.json"
   delete_output_file
   printf "\n# --- GCP Check VPC: ${VPC} --------------------------------------------\n" | tee -a ${RAW_OUTPUT}
   gcloud compute networks describe  ${VPC} --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
@@ -100,20 +108,29 @@ function get_this_vpc(){
 # default-allow-rdp: Allows ingress connections on TCP port 3389(RDP) from any source to any instance in the network.
 # default-allow-icmp: Allows ingress ICMP traffic from any source to any instance in the network.
 function get_default_network() {
-  OUTPUT="results/gcp_default_network_${MY_DATE}.json"
+  OUTPUT="results/gcp_default_network_${VPC}_${MY_DATE}.json"
   delete_output_file
   printf "\n# --- GCP Check Default Networks ---------------------------------\n" | tee -a ${RAW_OUTPUT}
   gcloud compute networks describe default --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function get_subnets() {
+  # This file shows the information about ALL subnets
   OUTPUT="results/gcp_subnets_one_${VPC}_${MY_DATE}.json"
   delete_output_file
   printf "\n# --- GCP Subnet Details ----------------------------------------\n" | tee -a ${RAW_OUTPUT}
   gcloud compute networks describe ${VPC} --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
+  # This file show information about subnets associated with current VPC
   OUTPUT="results/gcp_subnets_two_${VPC}_${MY_DATE}.json"
   printf "\n# --- GCP Subnet Details (Alternate) ----------------------------\n" | tee -a ${RAW_OUTPUT}
   gcloud compute networks subnets list --filter="network:${VPC}" --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
+}
+
+# scrape the VPC file for the active regions
+function get_regions() {
+  OUTPUT="results/gcp_regions_${MY_DATE}.json"
+  RESULT=$(cat "results/gcp_default_network_${MY_DATE}.json" | grep region gcp_all_vpc* | cut -f9 -d "/" | sort | uniq)
+  RESULTS="${RESULT%x}"
 }
 
 # By default, the VPC networks have two implied rules: one that denies all inbound traffic
@@ -158,7 +175,7 @@ function get_instance_groups {
 
 # This is part of the internal network load balancer configuration
 function get_health_checks {
-  OUTPUT="results/gcp_health_checks_${MY_DATE}.json"
+  OUTPUT="results/gcp_health_checks_${VPC}_${MY_DATE}.json"
   delete_output_file
   printf "\n# --- GCP Health Checks ------------------------------------------\n" | tee -a ${RAW_OUTPUT}
   gcloud compute http-health-checks list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
@@ -167,14 +184,15 @@ function get_health_checks {
 # This is part of the internal network load balancer configuration
 function get_backend() {
   # A regional backend service that monitors the usage and health of backends.
-  OUTPUT="results/gcp_backend_services_${MY_DATE}.json"
+  OUTPUT="results/gcp_backend_services_${VPC}_${MY_DATE}.json"
   delete_output_file
   printf "\n# --- GCP Backend Services ---------------------------------------\n" | tee -a ${RAW_OUTPUT}
   gcloud compute backend-services list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
+# this is part of the load balancer
 function get_url_maps() {
-  OUTPUT="results/gcp_url_maps_${MY_DATE}.json"
+  OUTPUT="results/gcp_url_maps_${VPC}_${MY_DATE}.json"
   delete_output_file
   printf "\n# --- GCP URL Maps -----------------------------------------------\n" | tee -a ${RAW_OUTPUT}
   gcloud compute url-maps list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
@@ -184,31 +202,43 @@ function get_url_maps() {
 # Collect some more ILB details
 function get_internal_lb() {
   printf "\n# --- GCP Target HTTP Proxies ------------------------------------\n" | tee -a ${RAW_OUTPUT}
-  OUTPUT="results/gcp_target_proxies_list_${MY_DATE}.json"
+  OUTPUT="results/gcp_target_proxies_list_${VPC}_${MY_DATE}.json"
   delete_output_file
   gcloud compute target-http-proxies list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
   
   printf "\n# --- GCP Target HTTPS Proxies -----------------------------------\n" | tee -a ${RAW_OUTPUT}
-  OUTPUT="results/gcp_https_proxies_${MY_DATE}.json"
+  OUTPUT="results/gcp_https_proxies_${VPC}_${MY_DATE}.json"
   delete_output_file
   gcloud compute target-https-proxies list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
   
   printf "\n# --- GCP Security Policies -----------------------------------\n" | tee -a ${RAW_OUTPUT}
-  OUTPUT="results/gcp_security_policies_${MY_DATE}.json"
+  OUTPUT="results/gcp_security_policies_${VPC}_${MY_DATE}.json"
   delete_output_file
   gcloud compute security-policies list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function get_ssl_certs() {
-  OUTPUT="results/gcp_ssl_certificates_${MY_DATE}.json"
+  OUTPUT="results/gcp_ssl_certificates_${VPC}_${MY_DATE}.json"
   delete_output_file
   printf "\n# --- GCP SSL Certificates ---------------------------------------\n" | tee -a ${RAW_OUTPUT}
   gcloud compute ssl-certificates list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 # This is part of the internal network load balancer configuration
+
+# Product	                                          Load balancing scheme	  IP Protocol options
+# Global external HTTP(S) load balancer	            EXTERNAL_MANAGED	      TCP
+# Global external HTTP(S) load balancer (classic)	  EXTERNAL	              TCP
+# Regional external HTTP(S) load balancer	          EXTERNAL_MANAGED	      TCP
+# External SSL proxy load balancer	                EXTERNAL	              TCP
+# External TCP proxy load balancer	                EXTERNAL	              TCP
+# Internal regional TCP proxy load balancer	        INTERNAL_MANAGED	      TCP
+# Network load balancer	                            EXTERNAL	              TCP, UDP, or L3_DEFAULT
+# Internal TCP/UDP load balancer	                  INTERNAL	              TCP or UDP
+# Internal HTTP(S) load balancer	                  INTERNAL_MANAGED	      TCP
+# Traffic Director	                                INTERNAL_SELF_MANAGED	 TCP
 function get_fwd_rules() {
-  OUTPUT="results/gcp_forwarding_rules_${MY_DATE}.json"
+  OUTPUT="results/gcp_forwarding_rules_${VPC}_${MY_DATE}.json"
   delete_output_file
   printf "\n# --- GCP Forwarding Rules --------------------------------------\n" | tee -a ${RAW_OUTPUT}
   gcloud compute forwarding-rules list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
@@ -223,32 +253,51 @@ function get_fwd_rules() {
 # the peering setup to import or export them. VPC network peers learn routing information dynamically
 #from their peered networks.
 function get_peerings() {
-  OUTPUT="results/gcp_peerings_${MY_DATE}.json"
+  OUTPUT="results/gcp_peerings_${VPC}_${MY_DATE}.json"
   delete_output_file
   printf "\n# --- GCP VPC Peerings ------------------------------------------\n" | tee -a ${RAW_OUTPUT}
   gcloud compute networks peerings list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
+
+#function get_peering_routes() {
+#  OUTPUT="results/gcp_peering_routes_${VPC}_${MY_DATE}.json"
+#  delete_output_file
+#  printf "\n# --- GCP VPC Peering Routes ------------------------------------\n" | tee -a ${RAW_OUTPUT}
+#  mapfile -t peer_names < <( gcloud compute networks peerings list | cut -f1 -d' ' )
+#  for peer in peer_namesdo
+
+#  done
+#}
 
 # A Cloud VPN gateway coupled with a Cloud Router enables static or dynamic IP routing between GCP and
 # the on-premises network. For increased connection resiliency, Cloud VPN supports configurations with
 # multiple tunnels to a single location for deployments with resilient on-premises VPN devices. Active/
 # active configuration is also possible if you deploy multiple Cloud VPN gateways.
 function get_vpn_gw() {
-  OUTPUT="results/gcp_vpn_gw_${MY_DATE}.json"
+  OUTPUT="results/gcp_vpn_gw_${VPC}_${MY_DATE}.json"
   delete_output_file
-  printf "\n# --- GCP VPC Peerings ------------------------------------------\n" | tee -a ${RAW_OUTPUT}
+  printf "\n# --- GCP VPN Gateways -----------------------------------------\n" | tee -a ${RAW_OUTPUT}
   gcloud compute vpn-gateways list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function save_results() {
   echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
   TARFILE="results/results_${MY_DATE}.tar"
+  if [ -f "${TARFILE}" ]; then
+    echo -e "\n${YELLOW}Found an existing TAR file. Renaming to results_${CURRENT_TIME}.tar${NC}\n"
+    mv ${TARFILE} results/results_${CURRENT_TIME}.tar
+  fi
   tar cvf ${TARFILE} results/*.json results/*.txt
+  if [ -f "${TARFILE}.xz" ]; then
+    echo -e "\n${YELLOW}Found an existing COMPRESSED TAR file. Renaming to results_${CURRENT_TIME}.tar.xz${NC}\n"
+    mv ${TARFILE}.xz results/results_${CURRENT_TIME}.tar.xz
+  fi
   ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
   for PROG in ${ZIP[@]}; do
     if command -v ${PROG} &>/dev/null; then
       echo -e "\n${LGREEN}Compressing tar file with ${PROG}${NC}\n"
-      if [ -f *"results_${MY_DATE}.tar."* ]; then rm results_${MY_DATE}.tar.*; fi
+      #if [ -f *"results/results_${MY_DATE}.tar."* ]; then rm results/results_${MY_DATE}.tar.*; fi
       ${PROG} -9 ${TARFILE}
       exit 0
     else
@@ -268,14 +317,14 @@ function main() {
   my_version | tee -a ${RAW_OUTPUT}
   
   echo "Current GCP Project is ${GCP_PROJECT}" | tee -a ${RAW_OUTPUT}
-  
+  get_projects
   get_all_vpc
-  
+  get_this_vpc
   # the numbers in the steps below match the picture "ilb-l7-numbered-components.png"
   
   # 1. we need A VPC network with at least two subnets
   get_subnets
-  
+  get_regions
   # 2. A firewall rule that permits proxy-only subnet traffic flows in your network.
   # This means adding one rule that allows TCP port 80, 443, and 8080 traffic from 10.129.0.0/23
   # (the range of the proxy-only subnet in this example).
@@ -326,7 +375,7 @@ function main() {
   get_routes
   get_default_network
   get_peerings
-  
+  get_vpn_gw
   # Compute Instances
   
   save_results
