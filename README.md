@@ -97,5 +97,3 @@ cd oci
 
 A small set of test and JSON output is generated from the execution of the
 scripts. Upload the compressed TAR file as directed.
-
-## OpenShift
