@@ -86,7 +86,7 @@ function get_projects() {
 # and security into and out of an application project, and a second set of administrators to control the
 # application project resources. (Similar to RG in Azure, not as easy to manage?)
 function get_all_vpc() {
-  OUTPUT="results/gcp_all_vpc_${GCP_PROJECT}_${MY_DATE}.json"
+  OUTPUT="results/gcp_all_vpc_${VPC}_${MY_DATE}.json"
   delete_output_file
   printf "\n# --- GCP Collect VPC Names --------------------------------------\n" | tee -a ${RAW_OUTPUT}
   gcloud compute networks list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
@@ -280,6 +280,21 @@ function get_vpn_gw() {
   gcloud compute vpn-gateways list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
+function get_instances() {
+  OUTPUT="results/gcp_instances_${VPC}_${MY_DATE}.json"
+  delete_output_file
+  printf "\n# --- GCP Instances --------------------------------------------\n" | tee -a ${RAW_OUTPUT}
+  gcloud compute instances list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
+}
+
+function get_target_instances() {
+  OUTPUT="results/gcp_target_instances_${VPC}_${MY_DATE}.json"
+  delete_output_file
+  printf "\n# --- GCP Target Instances --------------------------------------\n" | tee -a ${RAW_OUTPUT}
+  gcloud compute target-instances list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
+}
+
+
 function save_results() {
   echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
@@ -377,6 +392,8 @@ function main() {
   get_peerings
   get_vpn_gw
   # Compute Instances
+  get_instances
+  get_target_instances
   
   save_results
 }
