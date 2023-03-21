@@ -67,9 +67,9 @@ function my_version() {
 }
 
 function delete_output_file() {
-  if [ -f "${RAW_OUTPUT}" ]; then
-    echo -e "${LCYAN}removing stale file: ${RAW_OUTPUT}${NC}\n"
-    rm "${RAW_OUTPUT}"
+  if [ -f "${OUTPUT}" ]; then
+    echo -e "${LCYAN}removing stale file: ${OUTPUT}${NC}\n"
+    rm "${OUTPUT}"
   fi
 }
 
