@@ -8,6 +8,7 @@ results_*.tar*
 tests/results/*.json
 AzViz
 report.log
+*.pdf
 
 __pycache__
 

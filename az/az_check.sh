@@ -275,20 +275,29 @@ function get_policies() {
 }
 
 function save_results() {
-	echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	TARFILE="results/results_${MY_DATE}.tar"
-	tar cvf ${TARFILE} results/*.json results/*.txt
-	ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
-	for PROG in ${ZIP[@]}; do
-		if command -v ${PROG} &>/dev/null; then
-			echo -e "\n${LGREEN}Compressing tar file with ${PROG}${NC}\n"
-			if [ -f *"results_${MY_DATE}.tar."* ]; then rm results_${MY_DATE}.tar.*; fi
-			${PROG} -9 ${TARFILE}
-			exit 0
-		else
-			echo -e "\n${RED}${PROG} not found${NC}\n"
-		fi
-	done
+  echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
+  TARFILE="results/results_${MY_DATE}.tar"
+  if [ -f "${TARFILE}" ]; then
+    echo -e "\n${YELLOW}Found an existing TAR file. Renaming to results_${CURRENT_TIME}.tar${NC}\n"
+    mv ${TARFILE} results/results_${CURRENT_TIME}.tar
+  fi
+  tar cvf ${TARFILE} results/*.json results/*.txt
+  if [ -f "${TARFILE}.xz" ]; then
+    echo -e "\n${YELLOW}Found an existing COMPRESSED TAR file. Renaming to results_${CURRENT_TIME}.tar.xz${NC}\n"
+    mv ${TARFILE}.xz results/results_${CURRENT_TIME}.tar.xz
+  fi
+  ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
+  for PROG in ${ZIP[@]}; do
+    if command -v ${PROG} &>/dev/null; then
+      echo -e "\n${LGREEN}Compressing tar file with ${PROG}${NC}\n"
+      #if [ -f *"results/results_${MY_DATE}.tar."* ]; then rm results/results_${MY_DATE}.tar.*; fi
+      ${PROG} -9 ${TARFILE}
+      exit 0
+    else
+      echo -e "\n${RED}${PROG} not found${NC}\n"
+    fi
+  done
 }
 
 # --- The main() function ----------------------------------------
@@ -313,7 +322,6 @@ function main() {
 	get_network_int
 	# next one is complaining "(--resource-group --name | --ids) are required"
 	#get_log_an_ws # log analytics workspaces
-
 	save_results
 }
 
