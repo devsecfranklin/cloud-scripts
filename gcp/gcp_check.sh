@@ -300,7 +300,8 @@ function save_results() {
   CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
   TARFILE="results/results_${MY_DATE}.tar"
   if [ -f "${TARFILE}" ]; then
-    echo -e "\n${YELLOW}Found an existing TAR file, removing: ${TARFILE}${NC}\n"
+    echo -e "\n${YELLOW}Found an existing TAR file. Renaming to results_${CURRENT_TIME}.tar${NC}\n"
+    mv ${TARFILE} results/results_${CURRENT_TIME}.tar
   fi
   tar cvf ${TARFILE} results/*.json results/*.txt
   if [ -f "${TARFILE}.xz" ]; then

@@ -48,6 +48,7 @@ Execute the script once for each VPC (such as mgmt, trust, and untrust).
 Same as previous example, but in a single line:
 
 ```sh
+cd gcp
 for vpc in ps-devsecops-mgmt ps-devsecops-trust ps-devsecops-untrust; do \
     ./gcp_check.sh -v ${vpc}; done
 ```
