@@ -264,7 +264,7 @@ function get_log_an_ws() {
 	OUTPUT="results/az_log_analytics_workspaces_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect Azure Log Analytics Workspaces ------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az monitor log-analytics workspace list --resource-group "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+	az monitor log-analytics workspace list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_policies() {
@@ -278,15 +278,18 @@ function save_results() {
   echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
   TARFILE="results/results_${MY_DATE}.tar"
+  
   if [ -f "${TARFILE}" ]; then
-    echo -e "\n${YELLOW}Found an existing TAR file. Renaming to results_${CURRENT_TIME}.tar${NC}\n"
-    mv ${TARFILE} results/results_${CURRENT_TIME}.tar
+    echo -e "\n${YELLOW}Found an existing TAR file, removing: ${TARFILE}${NC}\n"
+	rm ${TARFILE}
   fi
-  tar cvf ${TARFILE} results/*.json results/*.txt
   if [ -f "${TARFILE}.xz" ]; then
-    echo -e "\n${YELLOW}Found an existing COMPRESSED TAR file. Renaming to results_${CURRENT_TIME}.tar.xz${NC}\n"
-    mv ${TARFILE}.xz results/results_${CURRENT_TIME}.tar.xz
+    echo -e "\n${YELLOW}Found an existing COMPRESSED TAR file. Removing ${TARFILE}.xz${NC}\n"
+    rm ${TARFILE}.xz
   fi
+  
+  tar cvf ${TARFILE} results/*.json results/*.txt
+
   ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
   for PROG in ${ZIP[@]}; do
     if command -v ${PROG} &>/dev/null; then
@@ -322,7 +325,6 @@ function main() {
 	get_network_int
 	# next one is complaining "(--resource-group --name | --ids) are required"
 	#get_log_an_ws # log analytics workspaces
-
 	save_results
 }
 
