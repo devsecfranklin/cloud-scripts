@@ -307,6 +307,7 @@ function save_results() {
     echo -e "\n${YELLOW}Found an existing COMPRESSED TAR file. Removing ${TARFILE}.xz${NC}\n"
     rm ${TARFILE}.xz
   fi
+  
   tar cvf ${TARFILE} results/*.json results/*.txt
 
   ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
