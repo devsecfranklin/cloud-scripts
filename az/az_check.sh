@@ -274,6 +274,13 @@ function get_policies() {
 	az policy state summarize -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
+function show_topology() {
+    OUTPUT="results/az_show_topology_${MY_DATE}.json"
+    delete_output_file
+    echo -e "${LCYAN}\n# --- Show Topology ------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+    az network watcher show-topology -g "${RESOURCE_GROUP}" | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+}
+
 function save_results() {
   echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
@@ -325,6 +332,7 @@ function main() {
 	get_network_int
 	# next one is complaining "(--resource-group --name | --ids) are required"
 	#get_log_an_ws # log analytics workspaces
+	show_topology
 	save_results
 }
 
