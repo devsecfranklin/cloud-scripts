@@ -13,6 +13,6 @@ jobs:
       - name: Test Azure
         run:  ${GITHUB_WORKSPACE}/az/az_check.sh -h
       - name: Test AWS
-        run:  ./aws/aws_check.sh -h
+        run:  ${GITHUB_WORKSPACE}/aws/aws_check.sh -h
       - name: Test GCP 
-        run:  ./gcp/gcp_check.sh -h
+        run:  ${GITHUB_WORKSPACE}/gcp/gcp_check.sh -h
