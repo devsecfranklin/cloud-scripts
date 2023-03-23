@@ -16,3 +16,5 @@ jobs:
         run:  ${GITHUB_WORKSPACE}/aws/aws_check.sh -h
       - name: Test GCP 
         run:  ${GITHUB_WORKSPACE}/gcp/gcp_check.sh -h
+      - name: Test OCI
+        run:  ${GITHUB_WORKSPACE}/oci/oci_check.sh -h

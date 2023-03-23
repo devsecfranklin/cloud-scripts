@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#set -eo # pipefail
+set -eo pipefail
 IFS=$'\n\t'
 
 # ------------------------------------------------------------------
@@ -80,7 +80,7 @@ function delete_output_file() {
 function get_rg() {
 	OUTPUT="results/az_resource_group_${RESOURCE_GROUP}_${MY_DATE}.json"
 	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure Network Details --------------------------\n${NC}" | tee "${RAW_OUTPUT}"
+	echo -e "${LCYAN}\n# --- Collect Azure Resource Group ---------------------------\n${NC}" | tee "${RAW_OUTPUT}"
 	az group show -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
@@ -186,7 +186,7 @@ function get_nsg() {
 # facilitated by a connection provider.
 
 function get_vpn_gw() {
-	OUTPUT="results/az_vpn_gw_${MY_DATE}.json"
+	OUTPUT="results/az_vpn_gw_${RESOURCE_GROUP}_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect Azure VPN Gateways ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	az network vpn-gateway list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
@@ -195,29 +195,49 @@ function get_vpn_gw() {
 # Express Routes
 
 function get_app_gw() {
-	OUTPUT="results/az_app_gw_${MY_DATE}.json"
+	OUTPUT="results/az_app_gw_${RESOURCE_GROUP}_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect Azure Application Gateways --------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	az network application-gateway list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_network_int() {
+	# gather the network interfaces
 	OUTPUT="results/az_network_interfaces_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect Azure Network Interfaces ----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	az network nic list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
-	az network nic list-effective-nsg 
+
+	# Create a list of the network Interfaces and cycle through to get effective Network Security Groups
+	MY_INTERFACES=$(cat ${OUTPUT} | grep name | grep -v null | grep -v primary | cut -f 4 -d'"')
+
+	# This is very helpful in troubleshooting, will fail if instance is not powered on
+	OUTPUT="results/az_network_interface_effective_nsg_${RESOURCE_GROUP}_${MY_DATE}.json"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect Azure Network Interface Effective NSG ----------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	for INT in ${MY_INTERFACES}
+	do
+	  az network nic list-effective-nsg -g "${RESOURCE_GROUP}" -n ${INT} -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+	done
+
+	OUTPUT="results/az_network_interface_effective_rt_${RESOURCE_GROUP}_${MY_DATE}.json"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect Azure Network Interface Effective Routes -------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	for INT in ${MY_INTERFACES}
+	do
+	  az network nic show-effective-route-table -g "${RESOURCE_GROUP}" -n ${INT} -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+	done
 }
 
 function get_local_network_gw() {
-	OUTPUT="results/az_local_network_gateways_${MY_DATE}.json"
+	OUTPUT="results/az_local_network_gateways_${RESOURCE_GROUP}_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect Azure Local Network Gateways -------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	az network local-gateway list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_public_ips() {
-	OUTPUT="results/az_public_ip_addresses_${MY_DATE}.json"
+	OUTPUT="results/az_public_ip_addresses_${RESOURCE_GROUP}_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect Azure Public IP Addresses -----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	az network public-ip list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
@@ -247,7 +267,7 @@ function get_public_ips() {
 # instances and allows you to scale your applications and provide high availability for services.
 
 function get_lbs() {
-	OUTPUT="results/az_network_load_balancers_${MY_DATE}.json"
+	OUTPUT="results/az_network_load_balancers_${RESOURCE_GROUP}_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect Azure Load Balancers ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	az network lb list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
