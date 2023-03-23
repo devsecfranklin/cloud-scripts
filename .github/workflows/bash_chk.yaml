@@ -1,4 +1,9 @@
 name: Script Validation
+on:
+  pull_request:
+  push:
+    branches:
+      - main
 jobs:
   runscript:
     name: Testing
