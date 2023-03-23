@@ -1,0 +1,12 @@
+name: Script Validation
+jobs:
+  runscript:
+    name: Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test Azure
+        run:  bash ./az/az_check.sh -h
+      - name: Test AWS
+        run:  bash ./aws/aws_check.sh -h
+      - name: Test GCP 
+        run:  bash ./gcp/gcp_check.sh -h
