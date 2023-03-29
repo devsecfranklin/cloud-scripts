@@ -14,11 +14,13 @@
 #
 # Example:
 #
-#     Run the script twice on two different VCN. Results are captured
-#     to a single log file with today's date.
+#     Run the script twice on two different VCN.
 #
 #     ./oci_check.sh -v ti-ai-network-host
 #     ./oci_check.sh ti-ai-outside
+#
+#     All results are captured to a single compressed
+#     TAR file with today's date at the end of each execution.
 #
 # ------------------------------------------------------------------
 
@@ -124,7 +126,7 @@ function get_net_sec_grp() {
 function save_results() {
   echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
-  TARFILE="results/results_${MY_DATE}.tar"
+  TARFILE="results_${MY_DATE}.tar"
   
   if [ -f "${TARFILE}" ]; then
     echo -e "\n${YELLOW}Found an existing TAR file, removing: ${TARFILE}${NC}\n"
