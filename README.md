@@ -95,6 +95,24 @@ Example:
 ./oci_check.sh -c ocid1.compartment.oc1..aaaaaaaa123412341234asdfasdf
 ```
 
+## OpenShift
+
+Download the script.
+
+```sh
+wget -O oci_check.sh https://raw.githubusercontent.com/devsecfranklin/cloud-scripts/main/oci/oci_check.sh
+chmod 755 oci_check.sh
+```
+
+Execute the script once for the `kube-system` namespace, and other desired namespaces.
+
+Example:
+
+```sh
+./openshift_check.sh -n kube-system
+./openshift_check.sh -n web-app-test
+```
+
 ## Results
 
 A small set of test and JSON output is generated from the execution of the
