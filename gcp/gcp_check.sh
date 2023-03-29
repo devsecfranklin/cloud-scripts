@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #set -euo # pipefail
 #IFS=$'\n\t'
@@ -14,11 +14,13 @@
 #
 # Example:
 #
-#     Run the script twice on two different VPC. Results are captured
-#     to a single log file with today's date.
+#     Run the script twice on two different VPC.
 #
 #     ./gcp_check.sh -v ti-ai-network-host
 #     ./gcp_check.sh -v ti-ai-outside
+#
+#     All results are captured to a single compressed
+#     TAR file with today's date at the end of each execution.
 #
 # ------------------------------------------------------------------
 
@@ -297,7 +299,7 @@ function get_target_instances() {
 function save_results() {
   echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
-  TARFILE="results/results_${MY_DATE}.tar"
+  TARFILE="results_${MY_DATE}.tar"
   
   if [ -f "${TARFILE}" ]; then
     echo -e "\n${YELLOW}Found an existing TAR file, removing: ${TARFILE}${NC}\n"
