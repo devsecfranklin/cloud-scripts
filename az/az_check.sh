@@ -253,7 +253,7 @@ function get_fw_nat_rules() {
 
 function get_network_int() {
   # gather the network interfaces
-  OUTPUT="results/az_network_interfaces_${MY_DATE}.json"
+  OUTPUT="results/az_network_interfaces_${RESOURCE_GROUP}_${MY_DATE}.json"
   delete_output_file
   echo -e "${LCYAN}\n# --- Collect Azure Network Interfaces ----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   az network nic list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
@@ -301,28 +301,28 @@ function get_lbs() {
 }
 
 function get_vms() {
-  OUTPUT="results/az_virtual_machines_${MY_DATE}.json"
+  OUTPUT="results/az_virtual_machines_${RESOURCE_GROUP}_${MY_DATE}.json"
   delete_output_file
   echo -e "${LCYAN}\n# --- Collect Azure Virtual Machines --------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   az vm list -g "${RESOURCE_GROUP}" -d -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_log_an_ws() {
-  OUTPUT="results/az_log_analytics_workspaces_${MY_DATE}.json"
+  OUTPUT="results/az_log_analytics_workspaces_${RESOURCE_GROUP}_${MY_DATE}.json"
   delete_output_file
   echo -e "${LCYAN}\n# --- Collect Azure Log Analytics Workspaces ------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   az monitor log-analytics workspace list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_policies() {
-  OUTPUT="results/az_network_policies_${MY_DATE}.json"
+  OUTPUT="results/az_network_policies_${RESOURCE_GROUP}_${MY_DATE}.json"
   delete_output_file
   echo -e "${LCYAN}\n# --- Collect Network Policies --------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   az policy state summarize -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function show_topology() {
-  OUTPUT="results/az_show_topology_${MY_DATE}.json"
+  OUTPUT="results/az_show_topology_${RESOURCE_GROUP}_${MY_DATE}.json"
   delete_output_file
   echo -e "${LCYAN}\n# --- Show Topology ------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   az network watcher show-topology -g "${RESOURCE_GROUP}" | tee -a "${OUTPUT}" "${RAW_OUTPUT}"

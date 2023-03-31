@@ -65,6 +65,7 @@ config.log
 COPYING
 INSTALL
 libtool
+TO-DO
 
 *.aux
 *.bbl
