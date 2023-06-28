@@ -1,6 +1,6 @@
 # cloud-scripts
 
-[![Script Validation](https://github.com/devsecfranklin/cloud-scripts/actions/workflows/bash_chk.yaml/badge.svg)](https://github.com/devsecfranklin/cloud-scripts/actions/workflows/bash_chk.yaml)
+[![Script Validation](https://github.com/devsecfranklin/cloud-scripts/actions/workflows/bash_chk.yaml/badge.svg)](https://github.com/devsecfranklin/cloud-scripts/actions/workflows/bash_chk.yaml) [![REUSE](https://github.com/devsecfranklin/cloud-tools/actions/workflows/reuse.yml/badge.svg)](https://github.com/devsecfranklin/cloud-tools/actions/workflows/reuse.yml)
 
 These scripts are for data gathering on public cloud infrastructure and configuration.
 
