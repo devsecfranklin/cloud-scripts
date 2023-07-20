@@ -9,6 +9,7 @@ tests/results/*.json
 AzViz
 report.log
 *.pdf
+*.tar.gz
 
 __pycache__
 

@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2023 DE:AD:10:C5 <franklin@dead10c5.org>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 #set -euo pipefail
 #IFS=$'\n\t'
 
 # ------------------------------------------------------------------
-# Author: Franklin D <devsecfranklin@duck.com>
 #
 #     Shell script to gather details about AWS configuration.
 #
@@ -61,7 +64,7 @@ function usage() {
 }
 
 function my_version() {
-	echo -e "${LGREEN}aws_check.sh - version 0.1 - fdiaz@paloaltonetworks.com${NC}"	
+	echo -e "${LGREEN}aws_check.sh - version 0.1 - fdiaz@paloaltonetworks.com${NC}"
 }
 
 function delete_output_file() {
@@ -71,6 +74,35 @@ function delete_output_file() {
 	fi
 }
 
+function get_igw() {
+	OUTPUT="results/aws_igw_${VPC}_${MY_DATE}.json"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS IGW Details -----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	aws ec2 describe-internet-gateways --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+}
+
+function get_subnets() {
+	OUTPUT="results/aws_subnets_${VPC}_${MY_DATE}.json"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS Subnets -----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	aws ec2 describe-subnets --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+}
+
+function get_route_tables() {
+	OUTPUT="results/aws_route_tables_${VPC}_${MY_DATE}.json"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS Route Tables -----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	aws ec2 describe-route-tables --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+}
+
+function get_nat_gw() {
+	OUTPUT="results/aws_nat_gateways_${VPC}_${MY_DATE}.json"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS NAT Gateways -----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	aws ec2 describe-nat-gateways --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+}
+
+# NOTE: this one does not collect JSON
 function get_tgw() {
 	OUTPUT="results/aws_tgw_${VPC}_${MY_DATE}.json"
 	delete_output_file
@@ -93,11 +125,60 @@ function get_lb() {
 	aws elb describe-load-balancers --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
+function get_elbv2() {
+	OUTPUT="results/aws_load_balancers_v2_${VPC}_${MY_DATE}.json"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS LB v2 Details ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	aws elbv2 describe-load-balancers --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+	MY_ELBV2=$(cat ${OUTPUT} | grep LoadBalancerArn | cut -f 4 -d'"')
+}
+
+function get_elbv2_listeners() {
+	OUTPUT="results/aws_load_balancers_v2_listeners_${VPC}_${MY_DATE}.json"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS LB v2 Listener Details ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	while IFS= read -r line; do
+		aws elbv2 describe-listeners --load-balancer-arn ${line} --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+	done <<<"${MY_ELBV2}"
+	MY_LISTENERS=$(cat ${OUTPUT} | grep ListenerArn | cut -f 4 -d'"')
+}
+
+function get_elbv2_rules() {
+	OUTPUT="results/aws_load_balancers_v2_rules_${VPC}_${MY_DATE}.json"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS LB v2 Rules ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	while IFS= read -r line; do
+		echo "Now checking $line"
+		aws elbv2 describe-rules --no-paginate --listener-arn ${line} --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+	done <<<"${MY_LISTENERS}"
+}
+
 function get_lb_target_grps() {
 	OUTPUT="results/aws_target_groups_${VPC}_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS TGT GRP Details ----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	aws elbv2 describe-target-groups --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+}
+
+function get_vpc_endpoints() {
+	OUTPUT="results/aws_vpc_endpoints_${VPC}_${MY_DATE}.json"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS VPC Endpoint Details ----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	aws ec2 describe-vpc-endpoints --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+}
+
+function get_vpc_end_svcs() {
+	OUTPUT="results/aws_vpc_end_svcs_${VPC}_${MY_DATE}.json"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS VPC Endpoint Svc Details ----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	aws ec2 describe-vpc-endpoint-services --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+}
+
+function get_vpc_endpoint_conns() {
+	OUTPUT="results/aws_vpc_endpoint_conns_${VPC}_${MY_DATE}.json"
+	delete_output_file
+	echo -e "${LCYAN}\n# --- Collect AWS VPC Endpoint Connection Details ----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	aws ec2 describe-vpc-endpoint-connections --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_sg() {
@@ -122,39 +203,39 @@ function get_interfaces() {
 }
 
 function get_eip() {
-	OUTPUT="results/aws_elasitc_ip_${VPC}_${MY_DATE}.json"
+	OUTPUT="results/aws_elastic_ip_${VPC}_${MY_DATE}.json"
 	delete_output_file
 	echo -e "${LCYAN}\n# --- Collect AWS EIP Details ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
 	aws ec2 describe-addresses --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function save_results() {
-  echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-  CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
-  TARFILE="results_${MY_DATE}.tar"
-  
-  if [ -f "${TARFILE}" ]; then
-    echo -e "\n${YELLOW}Found an existing TAR file, removing: ${TARFILE}${NC}\n"
-	rm ${TARFILE}
-  fi
-  if [ -f "${TARFILE}.xz" ]; then
-    echo -e "\n${YELLOW}Found an existing COMPRESSED TAR file. Removing ${TARFILE}.xz${NC}\n"
-    rm ${TARFILE}.xz
-  fi
-  
-  tar cvf ${TARFILE} results/*.json results/*.txt
+	echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+	CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
+	TARFILE="results_${MY_DATE}.tar"
 
-  ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
-  for PROG in ${ZIP[@]}; do
-    if command -v ${PROG} &>/dev/null; then
-      echo -e "\n${LGREEN}Compressing tar file with ${PROG}${NC}\n"
-      #if [ -f *"results/results_${MY_DATE}.tar."* ]; then rm results/results_${MY_DATE}.tar.*; fi
-      ${PROG} -9 ${TARFILE}
-      exit 0
-    else
-      echo -e "\n${RED}${PROG} not found${NC}\n"
-    fi
-  done
+	if [ -f "${TARFILE}" ]; then
+		echo -e "\n${YELLOW}Found an existing TAR file, removing: ${TARFILE}${NC}\n"
+		rm ${TARFILE}
+	fi
+	if [ -f "${TARFILE}.xz" ]; then
+		echo -e "\n${YELLOW}Found an existing COMPRESSED TAR file. Removing ${TARFILE}.xz${NC}\n"
+		rm ${TARFILE}.xz
+	fi
+
+	tar cvf ${TARFILE} results/*.json results/*.txt
+
+	ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
+	for PROG in ${ZIP[@]}; do
+		if command -v ${PROG} &>/dev/null; then
+			echo -e "\n${LGREEN}Compressing tar file with ${PROG}${NC}\n"
+			#if [ -f *"results/results_${MY_DATE}.tar."* ]; then rm results/results_${MY_DATE}.tar.*; fi
+			${PROG} -9 ${TARFILE}
+			exit 0
+		else
+			echo -e "\n${RED}${PROG} not found${NC}\n"
+		fi
+	done
 }
 
 # --- The main() function ----------------------------------------
@@ -169,6 +250,9 @@ function main() {
 	get_tgw
 	get_tgw_rt
 	get_lb
+	get_elbv2
+	get_elbv2_listeners
+	get_elbv2_rules
 	get_lb_target_grps
 
 	# instances
@@ -178,11 +262,13 @@ function main() {
 
 	# vpc
 	get_sg
-	#get_subnets
-	#get_nat_gw
-	#get_route_tables
-	#get_igw
-	#get_endpoints
+	get_subnets
+	get_nat_gw
+	get_route_tables
+	get_igw
+	get_vpc_endpoints
+	get_vpc_end_svcs
+	get_vpc_endpoint_conns
 
 	save_results
 }
