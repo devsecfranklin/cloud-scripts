@@ -1,9 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2023 DE:AD:10:C5 <franklin@dead10c5.org>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+#set -euo pipefail
+#IFS=$'\n\t'
 
 # Tue Mar 30 09:40:40 AM EST 2021
 # Wed Jul 28 07:24:20 AM EDT 2021 :: Update on checking OKTA username
-
-# fdiaz@paloaltonetworks.com
 
 # Based on this Confluence page: 
 # https://confluence.paloaltonetworks.local/pages/viewpage.action?spaceKey=IS&title=How+to+install+gimme-aws-creds+and+log+in+via+OKTA

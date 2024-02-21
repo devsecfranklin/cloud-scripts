@@ -1,4 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2023 DE:AD:10:C5 <franklin@dead10c5.org>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+#set -euo pipefail
+#IFS=$'\n\t'
 
 #Black        0;30     Dark Gray     1;30
 #Red          0;31     Light Red     1;31
@@ -21,26 +28,22 @@ MY_OS="unknown"
 TERRAFORM_LINK="https://releases.hashicorp.com/terraform/1.2.3/terraform_1.2.3_linux_amd64.zip"
 
 function detect_os() {
-    if [ "$(uname)" == "Darwin" ]
-    then
-        echo -e "${CYAN}Detected MacOS${NC}"
-        MY_OS="mac"
-    elif [ -f "/etc/redhat-release" ]
-    then
-        echo -e "${CYAN}Detected Red Hat/CentoOS/RHEL${NC}"
-        MY_OS="rh"
-    elif [ "$(grep -Ei 'debian|buntu|mint' /etc/*release)" ]
-    then
-        echo -e "${CYAN}Detected Debian/Ubuntu/Mint${NC}"
-        MY_OS="deb"
-    elif grep -q Microsoft /proc/version
-    then
-        echo -e "${CYAN}Detected Windows pretending to be Linux${NC}"
-        MY_OS="win"
-    else
-        echo -e "${YELLOW}Unrecongnized architecture.${NC}"
-        exit 1
-    fi
+  if [ "$(uname)" == "Darwin" ]; then
+    echo -e "${CYAN}Detected MacOS${NC}"
+    MY_OS="mac"
+  elif [ -f "/etc/redhat-release" ]; then
+    echo -e "${CYAN}Detected Red Hat/CentoOS/RHEL${NC}"
+    MY_OS="rh"
+  elif [ "$(grep -Ei 'debian|buntu|mint' /etc/*release)" ]; then
+    echo -e "${CYAN}Detected Debian/Ubuntu/Mint${NC}"
+    MY_OS="deb"
+  elif grep -q Microsoft /proc/version; then
+    echo -e "${CYAN}Detected Windows pretending to be Linux${NC}"
+    MY_OS="win"
+  else
+    echo -e "${YELLOW}Unrecongnized architecture.${NC}"
+    exit 1
+  fi
 }
 
 function macos() {
@@ -70,8 +73,8 @@ function amazon_linux() {
   sudo yum -y install terraform
 }
 
-function shell_manual(){
-  TF_FILE=`echo ${TERRAFORM_LINK} |  tr '/' '\n' | tail -n1`
+function shell_manual() {
+  TF_FILE=$(echo ${TERRAFORM_LINK} | tr '/' '\n' | tail -n1)
 
   if [ ! -f "${TF_FILE}" ]; then
     echo -e "${CYAN}Download new: ${TF_FILE}${NC}"

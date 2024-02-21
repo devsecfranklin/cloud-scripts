@@ -1,10 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# SPDX-FileCopyrightText: 2023 DE:AD:10:C5 <franklin@dead10c5.org>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
-#set -euo pipefail
+set -euo pipefail
 #IFS=$'\n\t'
 
 # ------------------------------------------------------------------
-# Author: Franklin Diaz <fdiaz@paloaltonetworks.com>
 #
 #     Shell script to gather details about AWS configuration.
 #
@@ -41,90 +44,89 @@ MY_DATE=$(date '+%Y-%m-%d-%H')
 RAW_OUTPUT="results/ibm_check_raw_output_${MY_DATE}.txt"
 REPORT="results/ibm_check_report_${MY_DATE}.txt"
 
-
 function my_version() {
-	echo -e "${LGREEN}ibm_check.sh - version 0.1 - fdiaz@paloaltonetworks.com${NC}"	
+  echo -e "${LGREEN}ibm_check.sh - version 0.1 - franklin@dead10c5.org${NC}"
 }
 
 function delete_output_file() {
-	if [ -f "${OUTPUT}" ]; then
-		echo -e "${LCYAN}removing stale file: ${OUTPUT}${NC}\n"
-		rm "${OUTPUT}"
-	fi
+  if [ -f "${OUTPUT}" ]; then
+    echo -e "${LCYAN}removing stale file: ${OUTPUT}${NC}\n"
+    rm "${OUTPUT}"
+  fi
 }
 
 function save_results() {
-	echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	TARFILE="results/results_${MY_DATE}.tar"
-	tar cvf ${TARFILE} results/*.json results/*.txt
-	ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
-	for PROG in ${ZIP[@]}; do
-		if command -v ${PROG} &>/dev/null; then
-			echo -e "\n${LGREEN}Compressing tar file with ${PROG}${NC}\n"
-			if [ -f *"results_${MY_DATE}.tar."* ]; then rm results_${MY_DATE}.tar.*; fi
-			${PROG} -9 ${TARFILE}
-			exit 0
-		else
-			echo -e "\n${RED}${PROG} not found${NC}\n"
-		fi
-	done
+  echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  TARFILE="results/results_${MY_DATE}.tar"
+  tar cvf ${TARFILE} results/*.json results/*.txt
+  ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
+  for PROG in ${ZIP[@]}; do
+    if command -v ${PROG} &>/dev/null; then
+      echo -e "\n${LGREEN}Compressing tar file with ${PROG}${NC}\n"
+      if [ -f *"results_${MY_DATE}.tar."* ]; then rm results_${MY_DATE}.tar.*; fi
+      ${PROG} -9 ${TARFILE}
+      exit 0
+    else
+      echo -e "\n${RED}${PROG} not found${NC}\n"
+    fi
+  done
 }
 
 function get_subnets() {
-	OUTPUT="results/ibm_subnets_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect IBM Subnet Details ------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	ibmcloud sl subnet list --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/ibm_subnets_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect IBM Subnet Details ------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  ibmcloud sl subnet list --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_hardware() {
-	OUTPUT="results/ibm_hardware_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect IBM Hardware Details ------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	ibmcloud sl hardware list --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/ibm_hardware_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect IBM Hardware Details ------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  ibmcloud sl hardware list --output json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 # --- The main() function ----------------------------------------
 function main() {
-	echo -e "${LCYAN}# --- ibm_check.sh ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	my_version | tee -a ${RAW_OUTPUT}
+  echo -e "${LCYAN}# --- ibm_check.sh ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  my_version | tee -a ${RAW_OUTPUT}
 
-    ibmcloud is regions --output json
-    ibmcloud resource groups --output json
-    # ibmcloud is vpcs
-    ibmcloud resource tags --output json
-    ibmcloud sl dns zone-list --output json
-    ibmcloud sl globalip list --output json
-    ibmcloud sl autoscale list --output json
-    ibmcloud is public-gateways --output json
-    ibmcloud is endpoint-gateways --output json
+  ibmcloud is regions --output json
+  ibmcloud resource groups --output json
+  # ibmcloud is vpcs
+  ibmcloud resource tags --output json
+  ibmcloud sl dns zone-list --output json
+  ibmcloud sl globalip list --output json
+  ibmcloud sl autoscale list --output json
+  ibmcloud is public-gateways --output json
+  ibmcloud is endpoint-gateways --output json
 
-    # access
-    ibmcloud sl firewall list --output json
-    ibmcloud sl securitygroup list --output json
-    ibmcloud is security-groups --output json
-    ibmcloud is network-acls --output json
+  # access
+  ibmcloud sl firewall list --output json
+  ibmcloud sl securitygroup list --output json
+  ibmcloud is security-groups --output json
+  ibmcloud is network-acls --output json
 
-    # storage
-    ibmcloud sl block object-list --output json
-    ibmcloud sl block volume-list --output json
-    ibmcloud sl file volume-list --output json
-    ibmcloud is volumes --output json
+  # storage
+  ibmcloud sl block object-list --output json
+  ibmcloud sl block volume-list --output json
+  ibmcloud sl file volume-list --output json
+  ibmcloud is volumes --output json
 
-    # hardware
-    get_hardware
-    ibmcloud is instances --output json
-    ibmcloud is bare-metal-servers --output json
-    ibmcloud is dedicated-hosts --output json
+  # hardware
+  get_hardware
+  ibmcloud is instances --output json
+  ibmcloud is bare-metal-servers --output json
+  ibmcloud is dedicated-hosts --output json
 
-    # network infra
-    ibmcloud is lbs # load balancers
-    get_subnets
-    ibmcloud sl vlan list --output json
-    ibmcloud is vpns --output json # VPN Gateways
-    ibmcloud is vpn-servers --output json # VPN Server
+  # network infra
+  ibmcloud is lbs # load balancers
+  get_subnets
+  ibmcloud sl vlan list --output json
+  ibmcloud is vpns --output json        # VPN Gateways
+  ibmcloud is vpn-servers --output json # VPN Server
 
-    save_results
+  save_results
 }
 
 main
