@@ -68,7 +68,7 @@ function usage() {
 }
 
 function my_version() {
-  echo -e "${LGREEN}gcp_check.sh - version 0.2 - fdiaz@paloaltonetwoks.com${NC}"
+  echo -e "${LGREEN}gcp_check.sh - version 0.2 - franklin@dead10c5.org${NC}"
 }
 
 function delete_output_file() {
@@ -83,7 +83,7 @@ function get_projects() {
   OUTPUT="results/gcp_projects_${GCP_PROJECT}_${MY_DATE}.json"
   delete_output_file
   printf "\n# --- GCP Collect Project Names ----------------------------------\n" | tee -a ${RAW_OUTPUT}
-  gcloud projects list --format=json  | tee -a ${OUTPUT} ${RAW_OUTPUT}
+  gcloud projects list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 # Shared VPC allows one project to share its VPC networks with one or more projects. Shared VPC is useful
@@ -97,11 +97,11 @@ function get_all_vpc() {
   gcloud compute networks list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
-function get_this_vpc(){
+function get_this_vpc() {
   OUTPUT="results/gcp_${VPC}_network_${MY_DATE}.json"
   delete_output_file
   printf "\n# --- GCP Check VPC: ${VPC} --------------------------------------------\n" | tee -a ${RAW_OUTPUT}
-  gcloud compute networks describe  ${VPC} --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
+  gcloud compute networks describe ${VPC} --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 # https://docs.bridgecrew.io/docs/bc_gcp_networking_7
@@ -210,12 +210,12 @@ function get_internal_lb() {
   OUTPUT="results/gcp_target_proxies_list_${VPC}_${MY_DATE}.json"
   delete_output_file
   gcloud compute target-http-proxies list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
-  
+
   printf "\n# --- GCP Target HTTPS Proxies -----------------------------------\n" | tee -a ${RAW_OUTPUT}
   OUTPUT="results/gcp_https_proxies_${VPC}_${MY_DATE}.json"
   delete_output_file
   gcloud compute target-https-proxies list --format=json | tee -a ${OUTPUT} ${RAW_OUTPUT}
-  
+
   printf "\n# --- GCP Security Policies -----------------------------------\n" | tee -a ${RAW_OUTPUT}
   OUTPUT="results/gcp_security_policies_${VPC}_${MY_DATE}.json"
   delete_output_file
@@ -303,16 +303,16 @@ function save_results() {
   echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
   TARFILE="results_${MY_DATE}.tar"
-  
+
   if [ -f "${TARFILE}" ]; then
     echo -e "\n${YELLOW}Found an existing TAR file, removing: ${TARFILE}${NC}\n"
-	rm ${TARFILE}
+    rm ${TARFILE}
   fi
   if [ -f "${TARFILE}.xz" ]; then
     echo -e "\n${YELLOW}Found an existing COMPRESSED TAR file. Removing ${TARFILE}.xz${NC}\n"
     rm ${TARFILE}.xz
   fi
-  
+
   tar cvf ${TARFILE} results/*.json results/*.txt
 
   ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
@@ -337,13 +337,13 @@ function main() {
   fi
   echo -e "${LCYAN}# --- gcp_check.sh -------------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   my_version | tee -a ${RAW_OUTPUT}
-  
+
   echo "Current GCP Project is ${GCP_PROJECT}" | tee -a ${RAW_OUTPUT}
   get_projects
   get_all_vpc
   get_this_vpc
   # the numbers in the steps below match the picture "ilb-l7-numbered-components.png"
-  
+
   # 1. we need A VPC network with at least two subnets
   get_subnets
   get_regions
@@ -352,23 +352,23 @@ function main() {
   # (the range of the proxy-only subnet in this example).
   # Another firewall rule for the health check probes.
   get_firewall_rules
-  
+
   # 3. Backend instances. (VM Series FW in this case)
-  
+
   # 4. Instance Groups
   # Managed or unmanaged instance groups for Compute Engine VM deployments
   get_instance_groups
-  
+
   # 5. A regional health check that reports the readiness of your backends.
   get_health_checks
-  
+
   # 6. A regional backend service that monitors the usage and health of backends.
   get_backend
-  
+
   # 7. A regional URL map that parses the URL of a request and forwards requests to specific
   # backend services based on the host and path of the request URL.
   get_url_maps
-  
+
   # 8. A regional target HTTP or HTTPS proxy, which receives a request from the user and forwards
   # it to the URL map. For HTTPS, configure a regional SSL certificate resource. The target proxy
   # uses the SSL certificate to decrypt SSL traffic if you configure HTTPS load balancing. The
@@ -376,9 +376,9 @@ function main() {
   #
   # GCP sends HTTP health checks from the IP ranges 209.85.152.0/22, 209.85.204.0/22, and 35.191.0.0/16
   get_internal_lb
-  
+
   get_ssl_certs
-  
+
   # 9. A forwarding rule, which has the internal IP address of your load balancer, to forward each
   # incoming request to the target proxy.
   #
@@ -392,7 +392,7 @@ function main() {
   #
   # For the forwarding rule's IP address, use the backend-subnet. If you try to use the proxy-only subnet, forwarding rule creation fails.
   get_fwd_rules
-  
+
   # Networking
   get_routes
   get_default_network
@@ -401,29 +401,29 @@ function main() {
   # Compute Instances
   get_instances
   get_target_instances
-  
+
   save_results
 }
 
 while getopts "hv:V" option; do
   case $option in
-    h)
-      usage
-      exit 0
+  h)
+    usage
+    exit 0
     ;;
-    v)
-      VPC=${OPTARG}
-      RAW_OUTPUT="results/gcp_check_raw_output_${VPC}_${MY_DATE}.txt"
-      main
-      exit 0
+  v)
+    VPC=${OPTARG}
+    RAW_OUTPUT="results/gcp_check_raw_output_${VPC}_${MY_DATE}.txt"
+    main
+    exit 0
     ;;
-    V)
-      my_version
-      exit 0
+  V)
+    my_version
+    exit 0
     ;;
-    \?)
-      usage
-      exit 1
+  \?)
+    usage
+    exit 1
     ;;
   esac
 done

@@ -68,7 +68,7 @@ function usage() {
 }
 
 function my_version() {
-  echo -e "${LGREEN}az_check.sh - version 0.1 - fdiaz@paloaltonetwoks.com${NC}"
+  echo -e "${LGREEN}az_check.sh - version 0.1 - franklin@dead10c5.org${NC}"
 }
 
 function delete_output_file() {
@@ -82,7 +82,7 @@ function save_results() {
   echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
   TARFILE="results_${MY_DATE}.tar"
-  
+
   if [ -f "${TARFILE}" ]; then
     echo -e "\n${YELLOW}Found an existing TAR file, removing: ${TARFILE}${NC}\n"
     rm ${TARFILE}
@@ -91,9 +91,9 @@ function save_results() {
     echo -e "\n${YELLOW}Found an existing COMPRESSED TAR file. Removing ${TARFILE}.xz${NC}\n"
     rm ${TARFILE}.xz
   fi
-  
+
   tar cvf ${TARFILE} results/*.json results/*.txt
-  
+
   ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
   for PROG in ${ZIP[@]}; do
     if command -v ${PROG} &>/dev/null; then
@@ -135,7 +135,7 @@ function get_vnets() {
   delete_output_file
   echo -e "${LCYAN}\n# --- Collect Azure Vnet Details -----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   az network vnet list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
-  
+
   # now use the same output file to determine Vnet peerings.
   # You achieve full, seamless IP reachability across VNets after you establish the peer connection.
   # All network traffic using VNet peering remains within the Azure backbone.
@@ -143,7 +143,7 @@ function get_vnets() {
   # 1. VNet peering — You have deployed the connected VNets within the same Azure region (example: West US).
   # 2. Global VNet peering — You have deployed the connected VNets across multiple Azure regions
   # (example: West US and East US). Some Azure networking capabilities are restricted when using Global VNet peering.
-  
+
 }
 
 # 1. For the management subnet, the route table should discard all traffic destined to the private and
@@ -163,11 +163,11 @@ function get_subnets() {
   delete_output_file
   echo -e "${LCYAN}\n# --- Collect Azure Subnet Details ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   az network vnet subnet list -g ${RESOURCE_GROUP} --vnet-name ${1} -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
-  
+
   # determine which is the mgmt subnet somehow. Prompt use to select perhaps?
-  
+
   # determine public subnets
-  
+
   # determine private subnets
 }
 
@@ -242,12 +242,12 @@ function get_app_gw() {
 # if there are firewalls, you can collect the NAT rules from them.
 function get_fw_nat_rules() {
   az extension add --upgrade -n azure-firewall | tee -a "${OUTPUT}" "${RAW_OUTPUT}" # install the needed extensions
-  
+
   OUTPUT="results/az_nat_rules_${RESOURCE_GROUP}_${MY_DATE}.json"
   delete_output_file
   echo -e "${LCYAN}\n# --- Collect Azure NAT Rules -------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   az network firewall list -g NYMTA-RG
-  
+
   OUTPUT="results/az_nat_rules_${RESOURCE_GROUP}_${MY_DATE}.json"
   delete_output_file
   echo -e "${LCYAN}\n# --- Collect Azure NAT Rules -------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
@@ -260,24 +260,22 @@ function get_network_int() {
   delete_output_file
   echo -e "${LCYAN}\n# --- Collect Azure Network Interfaces ----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   az network nic list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
-  
+
   # Create a list of the network Interfaces and cycle through to get effective Network Security Groups
   MY_INTERFACES=$(cat ${OUTPUT} | grep name | grep -v null | grep -v primary | cut -f 4 -d'"')
-  
+
   # This is very helpful in troubleshooting, will fail if instance is not powered on
   OUTPUT="results/az_network_interface_effective_nsg_${RESOURCE_GROUP}_${MY_DATE}.json"
   delete_output_file
   echo -e "${LCYAN}\n# --- Collect Azure Network Interface Effective NSG ----------\n${NC}" | tee -a "${RAW_OUTPUT}"
-  for INT in ${MY_INTERFACES}
-  do
+  for INT in ${MY_INTERFACES}; do
     az network nic list-effective-nsg -g "${RESOURCE_GROUP}" -n ${INT} -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
   done
-  
+
   OUTPUT="results/az_network_interface_effective_rt_${RESOURCE_GROUP}_${MY_DATE}.json"
   delete_output_file
   echo -e "${LCYAN}\n# --- Collect Azure Network Interface Effective Routes -------\n${NC}" | tee -a "${RAW_OUTPUT}"
-  for INT in ${MY_INTERFACES}
-  do
+  for INT in ${MY_INTERFACES}; do
     az network nic show-effective-route-table -g "${RESOURCE_GROUP}" -n ${INT} -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
   done
 }
@@ -365,23 +363,23 @@ fi
 
 while getopts "hr:V" option; do
   case $option in
-    h)
-      usage
-      exit 0
+  h)
+    usage
+    exit 0
     ;;
-    r)
-      RESOURCE_GROUP=${OPTARG}
-      RAW_OUTPUT="results/az_check_raw_output_${RESOURCE_GROUP}_${MY_DATE}.txt"
-      main
-      exit 0
+  r)
+    RESOURCE_GROUP=${OPTARG}
+    RAW_OUTPUT="results/az_check_raw_output_${RESOURCE_GROUP}_${MY_DATE}.txt"
+    main
+    exit 0
     ;;
-    V)
-      my_version
-      exit 0
+  V)
+    my_version
+    exit 0
     ;;
-    \?)
-      usage
-      exit 1
+  \?)
+    usage
+    exit 1
     ;;
   esac
 done

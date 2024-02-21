@@ -51,95 +51,95 @@ RAW_OUTPUT="results/oci_check_raw_output_${MY_DATE}.txt"
 COMPARTMENT="none"
 
 function usage() {
-	# Display Help
-	echo -e "\n${LGREEN}Oracle config check script."
-	echo
-	echo "Syntax: oci_check.sh [-h|-c|-V]"
-	echo "options:"
-	echo "h     Print this Help."
-	echo -e "${YELLOW}c     Specify a compartment OCID.${LGREEN}"
-	echo -e "V     Print software version and exit.\n${NC}"
+  # Display Help
+  echo -e "\n${LGREEN}Oracle config check script."
+  echo
+  echo "Syntax: oci_check.sh [-h|-c|-V]"
+  echo "options:"
+  echo "h     Print this Help."
+  echo -e "${YELLOW}c     Specify a compartment OCID.${LGREEN}"
+  echo -e "V     Print software version and exit.\n${NC}"
 }
 
 function my_version() {
-	echo "oci_check.sh - version 0.1 - fdiaz@paloaltonetworks.com"
+  echo "oci_check.sh - version 0.1 - franklin@dead10c5.org"
 }
 
 function get_all_vcn() {
-	echo -e "${LCYAN}\n# --- Collect Oracle VCN Details ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	OUTPUT="results/oci_vcn_${MY_DATE}.txt"
-	oci network vcn list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
+  echo -e "${LCYAN}\n# --- Collect Oracle VCN Details ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  OUTPUT="results/oci_vcn_${MY_DATE}.txt"
+  oci network vcn list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function get_drg() {
-	echo -e "${LCYAN}\n# --- Collect Oracle DRG Details ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	OUTPUT="results/oci_drg_${MY_DATE}.txt"
-	oci network drg list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
-	cat  | grep \""id\"" | cut -f4 -d"\""
+  echo -e "${LCYAN}\n# --- Collect Oracle DRG Details ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  OUTPUT="results/oci_drg_${MY_DATE}.txt"
+  oci network drg list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
+  cat | grep \""id\"" | cut -f4 -d"\""
 }
 
 function get_drg_attach() {
-	echo -e "${LCYAN}\n# --- Collect Oracle DRG Attach Details ---------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	OUTPUT="results/oci_drg_attach_${MY_DATE}.txt"
-	oci network drg-attachment list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
+  echo -e "${LCYAN}\n# --- Collect Oracle DRG Attach Details ---------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  OUTPUT="results/oci_drg_attach_${MY_DATE}.txt"
+  oci network drg-attachment list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function get_subnets() {
-	echo -e "${LCYAN}\n# --- Collect Oracle Subnet Details -------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	OUTPUT="results/oci_subnets_${MY_DATE}.txt"
-	oci network subnet list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
+  echo -e "${LCYAN}\n# --- Collect Oracle Subnet Details -------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  OUTPUT="results/oci_subnets_${MY_DATE}.txt"
+  oci network subnet list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function get_load_balancers() {
-	echo -e "${LCYAN}\n# --- Collect Oracle Load Balancer Details ------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	OUTPUT="results/oci_lb_${MY_DATE}.txt"
-	oci nlb network-load-balancer list --all --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
+  echo -e "${LCYAN}\n# --- Collect Oracle Load Balancer Details ------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  OUTPUT="results/oci_lb_${MY_DATE}.txt"
+  oci nlb network-load-balancer list --all --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function get_instances() {
-	echo -e "${LCYAN}\n# --- Collect Oracle Instance Details -----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	OUTPUT="results/oci_instances_${MY_DATE}.txt"
-	oci compute instance list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
+  echo -e "${LCYAN}\n# --- Collect Oracle Instance Details -----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  OUTPUT="results/oci_instances_${MY_DATE}.txt"
+  oci compute instance list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function get_security_lists() {
-	echo -e "${LCYAN}\n# --- Collect Oracle Security List Details ------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	OUTPUT="results/oci_security_lists_${MY_DATE}.txt"	
-	oci network security-list list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
+  echo -e "${LCYAN}\n# --- Collect Oracle Security List Details ------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  OUTPUT="results/oci_security_lists_${MY_DATE}.txt"
+  oci network security-list list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function get_route_tables() {
-	echo -e "${LCYAN}\n# --- Collect Oracle Route Table Details --------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	OUTPUT="results/oci_route_tables_${MY_DATE}.txt"	
-	oci network route-table list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
+  echo -e "${LCYAN}\n# --- Collect Oracle Route Table Details --------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  OUTPUT="results/oci_route_tables_${MY_DATE}.txt"
+  oci network route-table list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function get_local_peering_gw() {
-	echo -e "${LCYAN}\n# --- Collect Oracle Local Peering Gateway Details -----------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	OUTPUT="results/oci_local_peering_gw_${MY_DATE}.txt"	
-	oci network local-peering-gateway list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
+  echo -e "${LCYAN}\n# --- Collect Oracle Local Peering Gateway Details -----------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  OUTPUT="results/oci_local_peering_gw_${MY_DATE}.txt"
+  oci network local-peering-gateway list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function get_net_sec_grp() {
-	echo -e "${LCYAN}\n# --- Collect Oracle Network Security Groups -----------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	OUTPUT="results/oci_net_sec_grps_${MY_DATE}.txt"	
-	oci network nsg list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
+  echo -e "${LCYAN}\n# --- Collect Oracle Network Security Groups -----------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  OUTPUT="results/oci_net_sec_grps_${MY_DATE}.txt"
+  oci network nsg list --compartment-id ${COMPARTMENT} | tee -a ${OUTPUT} ${RAW_OUTPUT}
 }
 
 function save_results() {
   echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
   TARFILE="results_${MY_DATE}.tar"
-  
+
   if [ -f "${TARFILE}" ]; then
     echo -e "\n${YELLOW}Found an existing TAR file, removing: ${TARFILE}${NC}\n"
-	rm ${TARFILE}
+    rm ${TARFILE}
   fi
   if [ -f "${TARFILE}.xz" ]; then
     echo -e "\n${YELLOW}Found an existing COMPRESSED TAR file. Removing ${TARFILE}.xz${NC}\n"
     rm ${TARFILE}.xz
   fi
-  
+
   tar cvf ${TARFILE} results/*.json results/*.txt
 
   ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
@@ -157,45 +157,45 @@ function save_results() {
 
 # --- The main() function ----------------------------------------
 function main() {
-	if [ ! -d "results" ]; then mkdir results; fi
+  if [ ! -d "results" ]; then mkdir results; fi
 
-	printf "# --- oci_check.sh -------------------------------------------------\n" | tee -a ${RAW_OUTPUT}
-	my_version | tee -a ${RAW_OUTPUT}
+  printf "# --- oci_check.sh -------------------------------------------------\n" | tee -a ${RAW_OUTPUT}
+  my_version | tee -a ${RAW_OUTPUT}
 
-	get_all_vcn
-	get_drg
-	get_drg_attach
-	get_subnets
-	get_load_balancers
-	get_instances
-	get_security_lists
-	get_route_tables
-	get_local_peering_gw
-	get_net_sec_grp
-	save_results
+  get_all_vcn
+  get_drg
+  get_drg_attach
+  get_subnets
+  get_load_balancers
+  get_instances
+  get_security_lists
+  get_route_tables
+  get_local_peering_gw
+  get_net_sec_grp
+  save_results
 }
 
 while getopts "hc:V" option; do
-	case $option in
-	h)
-		usage
-		exit 0
-		;;
-	c)
-		COMPARTMENT=${OPTARG}
-		main
-		exit 0
-		;;
-	V)
-		my_version
-		exit 0
-		;;
-	\?)
-		usage
-		exit 1
-		;;
-	esac
+  case $option in
+  h)
+    usage
+    exit 0
+    ;;
+  c)
+    COMPARTMENT=${OPTARG}
+    main
+    exit 0
+    ;;
+  V)
+    my_version
+    exit 0
+    ;;
+  \?)
+    usage
+    exit 1
+    ;;
+  esac
 done
 if [ "$option" = "?" ]; then
-	usage && exit 1
+  usage && exit 1
 fi
