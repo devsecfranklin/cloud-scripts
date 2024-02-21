@@ -30,6 +30,7 @@ set -euo pipefail
 # recognizes word boundaries while splitting a sequence of character strings.
 #IFS=$'\n\t'
 
+
 #Black        0;30     Dark Gray     1;30
 #Red          0;31     Light Red     1;31
 #Green        0;32     Light Green   1;32
@@ -79,7 +80,7 @@ function save_results() {
   echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
   CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
   TARFILE="results_${MY_DATE}.tar"
-
+  
   if [ -f "${TARFILE}" ]; then
     echo -e "\n${YELLOW}Found an existing TAR file, removing: ${TARFILE}${NC}\n"
     rm ${TARFILE}
@@ -88,9 +89,9 @@ function save_results() {
     echo -e "\n${YELLOW}Found an existing COMPRESSED TAR file. Removing ${TARFILE}.xz${NC}\n"
     rm ${TARFILE}.xz
   fi
-
+  
   tar cvf ${TARFILE} results/*.json results/*.txt
-
+  
   ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
   for PROG in ${ZIP[@]}; do
     if command -v ${PROG} &>/dev/null; then
@@ -172,22 +173,22 @@ function main() {
 
 while getopts "hV" option; do
   case $option in
-  h)
-    usage
-    exit 0
+    h)
+      usage
+      exit 0
     ;;
-  n)
-    NAMESPACE=${OPTARG}
-    main
-    exit 0
+    n)
+      NAMESPACE=${OPTARG}
+      main
+      exit 0
     ;;
-  V)
-    my_version
-    exit 0
+    V)
+      my_version
+      exit 0
     ;;
-  \?)
-    usage
-    exit 1
+    \?)
+      usage
+      exit 1
     ;;
   esac
 done

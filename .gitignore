@@ -10,6 +10,7 @@ AzViz
 report.log
 *.pdf
 *.tar.gz
+.~lock.*.odt#
 
 __pycache__
 

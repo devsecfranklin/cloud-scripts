@@ -68,7 +68,7 @@ function usage() {
 }
 
 function my_version() {
-  echo -e "${LGREEN}az_check.sh - version 0.1 - franklin@dead10c5.org${NC}"
+  echo -e "${LGREEN}az_check.sh - version 0.2 - franklin@dead10c5.org${NC}"
 }
 
 function delete_output_file() {
@@ -329,6 +329,36 @@ function show_topology() {
   az network watcher show-topology -g "${RESOURCE_GROUP}" | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
+# Create an array to hold the list of workspace names for use in other functions
+function show_synapse_workspaces() {
+  OUTPUT="results/az_show_synapse_workspaces_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Show Synapse WS ----------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az synapse workspace list -g "${RESOURCE_GROUP}" | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+}
+
+# https://learn.microsoft.com/en-us/cli/azure/synapse/data-flow?view=azure-cli-latest#az-synapse-data-flow-list()
+function show_synapse_flows() {
+  OUTPUT="results/az_show_synapse_flows_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Show Synapse Flows -------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az synapse data-flow list --workspace-name xxx | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+}
+
+function show_synapse_fw() {
+  OUTPUT="results/az_show_synapse_firewall_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Show Synapse FW ----------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az synapse workspace firewall-rule list -g "${RESOURCE_GROUP}" --workspace-name xxx | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+}
+
+function show_synapse_sql_pool() {
+  OUTPUT="results/az_show_synapse_sql_pool_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Show Synapse SQL Pool ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az synapse sql pool list -g "${RESOURCE_GROUP}" --workspace-name xxx | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+}
+
 # --- The main() function ----------------------------------------
 function main() {
   if [ ! -d "results" ]; then
@@ -353,6 +383,13 @@ function main() {
   # next one is complaining "(--resource-group --name | --ids) are required"
   #get_log_an_ws # log analytics workspaces
   show_topology
+
+  # Synapse
+  show_synapse_workspaces
+  show_synapse_flows
+  show_synapse_fw
+  show_synapse_sql_pool
+
   save_results
 }
 

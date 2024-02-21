@@ -68,7 +68,7 @@ function usage() {
 }
 
 function my_version() {
-  echo -e "${LGREEN}gcp_check.sh - version 0.2 - franklin@dead10c5.org${NC}"
+  echo -e "${LGREEN}gcp_check.sh - version 0.2 - franklin@bitsmasher.net${NC}"
 }
 
 function delete_output_file() {
