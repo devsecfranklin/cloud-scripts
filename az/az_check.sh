@@ -57,54 +57,54 @@ declare -A ROUTES # (key: Route value: Route Table)
 declare -a SECURITY_GROUPS
 
 function usage() {
-	# Display Help
-	echo -e "\n${LGREEN}Azure config check script."
-	echo
-	echo "Syntax: az_check.sh [-h|-r|-V]"
-	echo "options:"
-	echo "-h     Print this Help."
-	echo -e "${YELLOW}-r     Specify a Resource Group (RG).${LGREEN}"
-	echo -e "-V     Print software version and exit.\n${NC}"
+  # Display Help
+  echo -e "\n${LGREEN}Azure config check script."
+  echo
+  echo "Syntax: az_check.sh [-h|-r|-V]"
+  echo "options:"
+  echo "-h     Print this Help."
+  echo -e "${YELLOW}-r     Specify a Resource Group (RG).${LGREEN}"
+  echo -e "-V     Print software version and exit.\n${NC}"
 }
 
 function my_version() {
-	echo -e "${LGREEN}az_check.sh - version 0.2 - franklin@dead10c5.org${NC}"
+  echo -e "${LGREEN}az_check.sh - version 0.2 - franklin@dead10c5.org${NC}"
 }
 
 function delete_output_file() {
-	if [ -f "${OUTPUT}" ]; then
-		echo -e "${LCYAN}removing stale file: ${OUTPUT}${NC}\n"
-		rm "${OUTPUT}"
-	fi
+  if [ -f "${OUTPUT}" ]; then
+    echo -e "${LCYAN}removing stale file: ${OUTPUT}${NC}\n"
+    rm "${OUTPUT}"
+  fi
 }
 
 function save_results() {
-	echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
-	TARFILE="results_${MY_DATE}.tar"
+  echo -e "\n${LCYAN}# --- Saving Results ----------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  CURRENT_TIME=$(date "+%Y.%m.%d-%H.%M.%S")
+  TARFILE="results_${MY_DATE}.tar"
 
-	if [ -f "${TARFILE}" ]; then
-		echo -e "\n${YELLOW}Found an existing TAR file, removing: ${TARFILE}${NC}\n"
-		rm ${TARFILE}
-	fi
-	if [ -f "${TARFILE}.xz" ]; then
-		echo -e "\n${YELLOW}Found an existing COMPRESSED TAR file. Removing ${TARFILE}.xz${NC}\n"
-		rm ${TARFILE}.xz
-	fi
+  if [ -f "${TARFILE}" ]; then
+    echo -e "\n${YELLOW}Found an existing TAR file, removing: ${TARFILE}${NC}\n"
+    rm ${TARFILE}
+  fi
+  if [ -f "${TARFILE}.xz" ]; then
+    echo -e "\n${YELLOW}Found an existing COMPRESSED TAR file. Removing ${TARFILE}.xz${NC}\n"
+    rm ${TARFILE}.xz
+  fi
 
-	tar cvf ${TARFILE} results/*.json results/*.txt
+  tar cvf ${TARFILE} results/*.json results/*.txt
 
-	ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
-	for PROG in ${ZIP[@]}; do
-		if command -v ${PROG} &>/dev/null; then
-			echo -e "\n${LGREEN}Compressing tar file with ${PROG}${NC}\n"
-			#if [ -f *"results/results_${MY_DATE}.tar."* ]; then rm results/results_${MY_DATE}.tar.*; fi
-			${PROG} -9 ${TARFILE}
-			exit 0
-		else
-			echo -e "\n${RED}${PROG} not found${NC}\n"
-		fi
-	done
+  ZIP=("xz" "bzip2" "gzip" "zip") # order matters in this string array
+  for PROG in ${ZIP[@]}; do
+    if command -v ${PROG} &>/dev/null; then
+      echo -e "\n${LGREEN}Compressing tar file with ${PROG}${NC}\n"
+      #if [ -f *"results/results_${MY_DATE}.tar."* ]; then rm results/results_${MY_DATE}.tar.*; fi
+      ${PROG} -9 ${TARFILE}
+      exit 0
+    else
+      echo -e "\n${RED}${PROG} not found${NC}\n"
+    fi
+  done
 }
 
 # Resource groups are logical containers that define who can manage and control resources.
@@ -116,10 +116,10 @@ function save_results() {
 # with each other is possible because resource groups do not control communication between resources.
 
 function get_rg() {
-	OUTPUT="results/az_resource_group_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure Resource Group ---------------------------\n${NC}" | tee "${RAW_OUTPUT}"
-	az group show -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_resource_group_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure Resource Group ---------------------------\n${NC}" | tee "${RAW_OUTPUT}"
+  az group show -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 # A virtual network (VNet) is a logically segmented network within Azure that allows connected resources
@@ -131,18 +131,18 @@ function get_rg() {
 # Azure location or not, as long as there is no overlap in the IP network definition.
 
 function get_vnets() {
-	OUTPUT="results/az_vnets_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure Vnet Details -----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az network vnet list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_vnets_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure Vnet Details -----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az network vnet list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 
-	# now use the same output file to determine Vnet peerings.
-	# You achieve full, seamless IP reachability across VNets after you establish the peer connection.
-	# All network traffic using VNet peering remains within the Azure backbone.
-	#
-	# 1. VNet peering — You have deployed the connected VNets within the same Azure region (example: West US).
-	# 2. Global VNet peering — You have deployed the connected VNets across multiple Azure regions
-	# (example: West US and East US). Some Azure networking capabilities are restricted when using Global VNet peering.
+  # now use the same output file to determine Vnet peerings.
+  # You achieve full, seamless IP reachability across VNets after you establish the peer connection.
+  # All network traffic using VNet peering remains within the Azure backbone.
+  #
+  # 1. VNet peering — You have deployed the connected VNets within the same Azure region (example: West US).
+  # 2. Global VNet peering — You have deployed the connected VNets across multiple Azure regions
+  # (example: West US and East US). Some Azure networking capabilities are restricted when using Global VNet peering.
 
 }
 
@@ -159,16 +159,16 @@ function get_vnets() {
 #    Discard traffic destined to the management network range by using the next hop of none.
 
 function get_subnets() {
-	OUTPUT="results/az_subnets_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure Subnet Details ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az network vnet subnet list -g ${RESOURCE_GROUP} --vnet-name ${1} -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_subnets_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure Subnet Details ---------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az network vnet subnet list -g ${RESOURCE_GROUP} --vnet-name ${1} -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 
-	# determine which is the mgmt subnet somehow. Prompt use to select perhaps?
+  # determine which is the mgmt subnet somehow. Prompt use to select perhaps?
 
-	# determine public subnets
+  # determine public subnets
 
-	# determine private subnets
+  # determine private subnets
 }
 
 # User-defined routes (UDRs) modify the default traffic-forwarding behavior of Azure networking.
@@ -185,10 +185,10 @@ function get_subnets() {
 # not have a more specific UDR
 
 function get_route_tables() {
-	OUTPUT="results/az_route_table_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure Route Tables -----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az network route-table list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_route_table_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure Route Tables -----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az network route-table list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 # Network security groups (NSGs) filter traffic into and out of subnets and virtual machine network
@@ -209,10 +209,10 @@ function get_route_tables() {
 # • Deny all other traffic.
 
 function get_nsg() {
-	OUTPUT="results/az_network_security_groups_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure Network Security Groups -----------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az network nsg list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_network_security_groups_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure Network Security Groups -----------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az network nsg list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 # The Azure virtual network gateway (VNG) provides connectivity between an Azure virtual network and your
@@ -224,202 +224,202 @@ function get_nsg() {
 # facilitated by a connection provider.
 
 function get_vpn_gw() {
-	OUTPUT="results/az_vpn_gw_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure VPN Gateways ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az network vpn-gateway list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_vpn_gw_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure VPN Gateways ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az network vpn-gateway list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 # Express Routes
 
 function get_app_gw() {
-	OUTPUT="results/az_app_gw_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure Application Gateways --------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az network application-gateway list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_app_gw_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure Application Gateways --------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az network application-gateway list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 # if there are firewalls, you can collect the NAT rules from them.
 function get_fw_nat_rules() {
-	az extension add --upgrade -n azure-firewall | tee -a "${OUTPUT}" "${RAW_OUTPUT}" # install the needed extensions
+  az extension add --upgrade -n azure-firewall | tee -a "${OUTPUT}" "${RAW_OUTPUT}" # install the needed extensions
 
-	OUTPUT="results/az_nat_rules_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure NAT Rules -------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az network firewall list -g NYMTA-RG
+  OUTPUT="results/az_nat_rules_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure NAT Rules -------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az network firewall list -g NYMTA-RG
 
-	OUTPUT="results/az_nat_rules_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure NAT Rules -------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az network firewall nat-rule list -g NYMTA-RG -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_nat_rules_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure NAT Rules -------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az network firewall nat-rule list -g NYMTA-RG -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_network_int() {
-	# gather the network interfaces
-	OUTPUT="results/az_network_interfaces_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure Network Interfaces ----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az network nic list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  # gather the network interfaces
+  OUTPUT="results/az_network_interfaces_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure Network Interfaces ----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az network nic list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 
-	# Create a list of the network Interfaces and cycle through to get effective Network Security Groups
-	MY_INTERFACES=$(cat ${OUTPUT} | grep name | grep -v null | grep -v primary | cut -f 4 -d'"')
+  # Create a list of the network Interfaces and cycle through to get effective Network Security Groups
+  MY_INTERFACES=$(cat ${OUTPUT} | grep name | grep -v null | grep -v primary | cut -f 4 -d'"')
 
-	# This is very helpful in troubleshooting, will fail if instance is not powered on
-	OUTPUT="results/az_network_interface_effective_nsg_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure Network Interface Effective NSG ----------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	for INT in ${MY_INTERFACES}; do
-		az network nic list-effective-nsg -g "${RESOURCE_GROUP}" -n ${INT} -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
-	done
+  # This is very helpful in troubleshooting, will fail if instance is not powered on
+  OUTPUT="results/az_network_interface_effective_nsg_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure Network Interface Effective NSG ----------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  for INT in ${MY_INTERFACES}; do
+    az network nic list-effective-nsg -g "${RESOURCE_GROUP}" -n ${INT} -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  done
 
-	OUTPUT="results/az_network_interface_effective_rt_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure Network Interface Effective Routes -------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	for INT in ${MY_INTERFACES}; do
-		az network nic show-effective-route-table -g "${RESOURCE_GROUP}" -n ${INT} -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
-	done
+  OUTPUT="results/az_network_interface_effective_rt_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure Network Interface Effective Routes -------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  for INT in ${MY_INTERFACES}; do
+    az network nic show-effective-route-table -g "${RESOURCE_GROUP}" -n ${INT} -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  done
 }
 
 function get_local_network_gw() {
-	OUTPUT="results/az_local_network_gateways_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure Local Network Gateways -------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az network local-gateway list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_local_network_gateways_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure Local Network Gateways -------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az network local-gateway list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_public_ips() {
-	OUTPUT="results/az_public_ip_addresses_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure Public IP Addresses -----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az network public-ip list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_public_ip_addresses_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure Public IP Addresses -----------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az network public-ip list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_lbs() {
-	OUTPUT="results/az_network_load_balancers_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure Load Balancers ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az network lb list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_network_load_balancers_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure Load Balancers ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az network lb list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_vms() {
-	OUTPUT="results/az_virtual_machines_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure Virtual Machines --------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az vm list -g "${RESOURCE_GROUP}" -d -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_virtual_machines_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure Virtual Machines --------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az vm list -g "${RESOURCE_GROUP}" -d -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_log_an_ws() {
-	OUTPUT="results/az_log_analytics_workspaces_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Azure Log Analytics Workspaces ------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az monitor log-analytics workspace list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_log_analytics_workspaces_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Azure Log Analytics Workspaces ------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az monitor log-analytics workspace list -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function get_policies() {
-	OUTPUT="results/az_network_policies_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Collect Network Policies --------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az policy state summarize -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_network_policies_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Collect Network Policies --------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az policy state summarize -g "${RESOURCE_GROUP}" -o json | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function show_topology() {
-	OUTPUT="results/az_show_topology_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Show Topology ------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az network watcher show-topology -g "${RESOURCE_GROUP}" | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_show_topology_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Show Topology ------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az network watcher show-topology -g "${RESOURCE_GROUP}" | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 # Create an array to hold the list of workspace names for use in other functions
 function show_synapse_workspaces() {
-	OUTPUT="results/az_show_synapse_workspaces_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Show Synapse WS ----------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az synapse workspace list -g "${RESOURCE_GROUP}" | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_show_synapse_workspaces_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Show Synapse WS ----------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az synapse workspace list -g "${RESOURCE_GROUP}" | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 # https://learn.microsoft.com/en-us/cli/azure/synapse/data-flow?view=azure-cli-latest#az-synapse-data-flow-list()
 function show_synapse_flows() {
-	OUTPUT="results/az_show_synapse_flows_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Show Synapse Flows -------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az synapse data-flow list --workspace-name xxx | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_show_synapse_flows_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Show Synapse Flows -------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az synapse data-flow list --workspace-name xxx | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function show_synapse_fw() {
-	OUTPUT="results/az_show_synapse_firewall_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Show Synapse FW ----------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az synapse workspace firewall-rule list -g "${RESOURCE_GROUP}" --workspace-name xxx | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_show_synapse_firewall_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Show Synapse FW ----------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az synapse workspace firewall-rule list -g "${RESOURCE_GROUP}" --workspace-name xxx | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 function show_synapse_sql_pool() {
-	OUTPUT="results/az_show_synapse_sql_pool_${RESOURCE_GROUP}_${MY_DATE}.json"
-	delete_output_file
-	echo -e "${LCYAN}\n# --- Show Synapse SQL Pool ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	az synapse sql pool list -g "${RESOURCE_GROUP}" --workspace-name xxx | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
+  OUTPUT="results/az_show_synapse_sql_pool_${RESOURCE_GROUP}_${MY_DATE}.json"
+  delete_output_file
+  echo -e "${LCYAN}\n# --- Show Synapse SQL Pool ----------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  az synapse sql pool list -g "${RESOURCE_GROUP}" --workspace-name xxx | tee -a "${OUTPUT}" "${RAW_OUTPUT}"
 }
 
 # --- The main() function ----------------------------------------
 function main() {
-	if [ ! -d "results" ]; then
-		mkdir results
-	else
-		delete_output_file
-	fi
-	echo -e "${LCYAN}# --- az_check.sh -------------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
-	my_version | tee -a ${RAW_OUTPUT}
-	get_rg    # get the resource group
-	get_vnets # get the vnets from the RG
-	#get_subnets included in the get vnet output, might be easier to parse JSON if separate
-	get_route_tables
-	get_nsg
-	get_app_gw
-	get_fw_nat_rules
-	get_local_network_gw
-	get_public_ips
-	get_lbs
-	get_vms
-	get_network_int
-	# next one is complaining "(--resource-group --name | --ids) are required"
-	#get_log_an_ws # log analytics workspaces
-	show_topology
+  if [ ! -d "results" ]; then
+    mkdir results
+  else
+    delete_output_file
+  fi
+  echo -e "${LCYAN}# --- az_check.sh -------------------------------------------------\n${NC}" | tee -a "${RAW_OUTPUT}"
+  my_version | tee -a ${RAW_OUTPUT}
+  get_rg    # get the resource group
+  get_vnets # get the vnets from the RG
+  #get_subnets included in the get vnet output, might be easier to parse JSON if separate
+  get_route_tables
+  get_nsg
+  get_app_gw
+  get_fw_nat_rules
+  get_local_network_gw
+  get_public_ips
+  get_lbs
+  get_vms
+  get_network_int
+  # next one is complaining "(--resource-group --name | --ids) are required"
+  #get_log_an_ws # log analytics workspaces
+  show_topology
 
-	# Synapse
-	show_synapse_workspaces
-	show_synapse_flows
-	show_synapse_fw
-	show_synapse_sql_pool
+  # Synapse
+  show_synapse_workspaces
+  show_synapse_flows
+  show_synapse_fw
+  show_synapse_sql_pool
 
-	save_results
+  save_results
 }
 
 if [ $# -lt 1 ]; then
-	usage
-	exit 1
+  usage
+  exit 1
 fi
 
 while getopts "hr:V" option; do
-	case $option in
-	h)
-		usage
-		exit 0
-		;;
-	r)
-		RESOURCE_GROUP=${OPTARG}
-		RAW_OUTPUT="results/az_check_raw_output_${RESOURCE_GROUP}_${MY_DATE}.txt"
-		main
-		exit 0
-		;;
-	V)
-		my_version
-		exit 0
-		;;
-	\?)
-		usage
-		exit 1
-		;;
-	esac
+  case $option in
+  h)
+    usage
+    exit 0
+    ;;
+  r)
+    RESOURCE_GROUP=${OPTARG}
+    RAW_OUTPUT="results/az_check_raw_output_${RESOURCE_GROUP}_${MY_DATE}.txt"
+    main
+    exit 0
+    ;;
+  V)
+    my_version
+    exit 0
+    ;;
+  \?)
+    usage
+    exit 1
+    ;;
+  esac
 done
 if [ "$option" = "?" ]; then
-	usage && exit 1
+  usage && exit 1
 fi
