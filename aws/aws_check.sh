@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-set -euo pipefail
+Set -euo pipefail
 #IFS=$'\n\t'
 
 # ------------------------------------------------------------------
