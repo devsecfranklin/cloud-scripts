@@ -1,4 +1,4 @@
-fw8:
+fw9:
   FW_NAME: "lab-franklin-gcp-eight"
   UNTRUST_SUBNET: lab-franklin-untrust
   MGMT_SUBNET: ps-devsecops-mgmt

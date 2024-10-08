@@ -51,8 +51,19 @@ DATA_DIR="/tmp/palo/data"
 LOGGING_DIR="/tmp/palo/log"
 MY_DATE=$(date '+%Y-%m-%d-%H')
 RAW_OUTPUT="palo_gcloud_deploy_${MY_DATE}.txt" # log file name
-SSH_KEY="admin:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCu+5vKjTtTWZwlDlm7AlmQdWKujHq7cWnoeJZa/sUGNj+rg8d+SfJZCF+cSuOEFxqJ6wVbX5WSAvB0MNETtncVsC6NvKNSGFsc8vIrIas5cQtyk8frp6SA9aJ/M90p2ekYwPVhqshGCLiRZ1enbm+8uvpGZkWW/g7eQV8HbxFnFCsdf9JZzHcnXWOD8tkRO9r/uuIX31BmVxEG2YE8IPC3Xq18hGglLsi0vOGdBicfOGGc/DRsw6wxXSjXF66nJAxmKZgg4lWzNIe8MkEJthI9cWPsTWcJC3XPpRuKQY6crofZa+atwkymhYJ/MUIJW4172cWLpbA1+4dvSFKSUpyo/Qs+0Zpft8vVvceaDhOsNCpzKk/qINZ3Z+Q/B4I9Ribw83K3FwfAlr6t35Z4j7cCw3VrlJtyVHrwUnVwkCNuw2zcWISfXSnCCFyVgxiJltnqk6CBOUfk6P3qIXqvQqQqp3cB1SiimVtSN5bzITiNnAdySnOUYJIsmMxkPH0Qua8cOQNNs2Ns9zAjgilTZtzG0siJtWmHJrg8+3jMG5mwzOvIgT3DadAx5ao1/+8ak4gBfoqSrLSJXPwW8Myl/I3/uxVkbxb4+jjJwnxKsbGS5LnfVGSvqEFXgtGYfNz79emdIWf3Tbh6Lv9+3Rrt9maCPg3/i5QtWBpaflI2RxurbQ== fdiaz@paloaltonetworks.com"
+#SSH_KEY='admin:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCu+5vKjTtTWZwlDlm7AlmQdWKujHq7cWnoeJZa/sUGNj+rg8d+SfJZCF+cSuOEFxqJ6wVbX5WSAvB0MNETtncVsC6NvKNSGFsc8vIrIas5cQtyk8frp6SA9aJ/M90p2ekYwPVhqshGCLiRZ1enbm+8uvpGZkWW/g7eQV8HbxFnFCsdf9JZzHcnXWOD8tkRO9r/uuIX31BmVxEG2YE8IPC3Xq18hGglLsi0vOGdBicfOGGc/DRsw6wxXSjXF66nJAxmKZgg4lWzNIe8MkEJthI9cWPsTWcJC3XPpRuKQY6crofZa+atwkymhYJ/MUIJW4172cWLpbA1+4dvSFKSUpyo/Qs+0Zpft8vVvceaDhOsNCpzKk/qINZ3Z+Q/B4I9Ribw83K3FwfAlr6t35Z4j7cCw3VrlJtyVHrwUnVwkCNuw2zcWISfXSnCCFyVgxiJltnqk6CBOUfk6P3qIXqvQqQqp3cB1SiimVtSN5bzITiNnAdySnOUYJIsmMxkPH0Qua8cOQNNs2Ns9zAjgilTZtzG0siJtWmHJrg8+3jMG5mwzOvIgT3DadAx5ao1/+8ak4gBfoqSrLSJXPwW8Myl/I3/uxVkbxb4+jjJwnxKsbGS5LnfVGSvqEFXgtGYfNz79emdIWf3Tbh6Lv9+3Rrt9maCPg3/i5QtWBpaflI2RxurbQ== fdiaz@paloaltonetworks.com'
+ SSH_KEY='admin:ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAuGlWP+TBdHo3ixHg/NCVGCJuqeLO+jWklyLEVHrzJPRqz69XGqtZR40KgOI2sItuoLm1Us3ja6WeauSssDkcoZBuzdO9fF999w/FoPa+yGu6GzBxQ2m4Q8pYznDqKuGVKxIb0aoj5XL/mYcD8EZxuh0Oa3lE/wx7cV8qiL3uaVwEfB9MgbqO+i6flmrwLzmL5fJVNmF9L6dI1d1NDruwSxtj9/jgFXyDqrX+NVFSUsiKBF0Rjp60+XR6MhXewTghxvhVFqhLz+fOItSDpRzFVdgoxuEMFnAYGJyVUUi5HKTHNhoDflHb+DZ5YthZ/vEOAxfOzXohNg/VSkcrxXSrsQ== admin@Rob'
 YAML_FILE="deploy_fw.yaml"
+
+function usage() {
+  # Display Help
+  echo -e "\n${YELLOW}Deploy GCP FW script."
+  echo
+  echo "Syntax: ${0} [-h|-t]"
+  echo "options:"
+  echo "-h     Print this Help."
+  echo -e "-t     Test the YAML file.\n${NC}"
+}
 
 function directory_setup() {
   if [ ! -d "${LOGGING_DIR}" ]; then
@@ -71,6 +82,16 @@ function directory_setup() {
     mkdir -p ${DATA_DIR}
   fi
   echo -e "${LGREEN}Data directory is: ${LCYAN}${DATA_DIR}${NC}" | tee -a "${RAW_OUTPUT}"
+}
+
+function check_installed() {
+  if ! command -v ${1} &>/dev/null; then
+    echo -e "${LRED}${1} could not be found${NC}"
+    return 1
+  else
+    echo -e "${LPURP}Found command: ${1}${NC}"
+    return 0
+  fi
 }
 
 function parse_yaml {
@@ -105,6 +126,9 @@ function parse_yaml {
       fi
       i=$((i+1))
     done)
+    printf -v key "%q" "$key"
+    printf -v val "%q" "$val"
+    my_arr["$key"]+="${val}"
     echo ${doo_doo} # this line is needed so we can capture the output from the child process
 }
 
@@ -128,6 +152,15 @@ function deploy_firewall() {
 }
 
 function test_array() {
+
+  # check to make sure the fields all exist in the YAML
+  declare -a my_fields=( "KEY" )
+  for i in "${!my_arr[@]}"
+  do
+    echo "key  : $i"
+    echo "value: ${my_arr[$i]}"
+  done
+
   echo -e "final length: ${#my_arr[@]}"
   for key in "${!my_arr[@]}"; do
     echo -e "key: $key"
@@ -146,6 +179,47 @@ function test_array() {
 }
 
 function main() {
+cat <<"EOF"
+                     .
+         /^\     .
+    /\   "V"
+   /__\   I      O  o
+  //..\\  I     .
+  \].`[/  I
+  /l\/j\  (]    .  O
+ /. ~~ ,\/I          .
+ \\L__j^\/I       o
+  \/--v}  I     o   .
+  |    |  I   _________
+  |    |  I c(`       ')o
+  |    l  I   \.     ,/
+_/j  L l\_!  _//^---^\\_    deploy_fw_gcp.sh
+EOF
+
+  while getopts "ht" opt; do
+    case "${opt}" in
+    h)
+      usage
+      exit 0
+      ;;
+    t)
+      TESTING=true
+      echo -e "${LGREEN}Test the YAML file.${NC}"
+      ;;
+    :)
+      echo "Option -${OPTARG} requires an argument."
+      exit 1
+      ;;
+    ?)
+      echo "Invalid option: -${OPTARG}."
+      usage
+      exit 1
+      ;;
+    esac
+  done
+
+  # shift "$(( OPTIND - 1 ))" # is this needed
+
   directory_setup # the logging directory
 
   # load the YAML file
@@ -153,11 +227,11 @@ function main() {
     echo -e "${LRED}Unable to find YAML file: ${YAML_FILE}${NC}" | tee -a "${RAW_OUTPUT}"
     exit 1
   else
-    if ! command -v yamllint 2>&1 >/dev/null; then
-      echo -e "${LRED}yamllint could not be found, skipping YAML validation${NC}" | tee -a "${RAW_OUTPUT}"
-    else
+    if check_installed yamllint; then
       echo -e "${LGREEN}Validating YAML file: ${LCYAN}${YAML_FILE}${NC}" | tee -a "${RAW_OUTPUT}"
       yamllint ${YAML_FILE}
+    else
+      echo -e "${LRED}yamllint could not be found, skipping YAML validation${NC}" | tee -a "${RAW_OUTPUT}"
     fi
     echo -e "${LGREEN}Loading YAML file: ${LCYAN}${YAML_FILE}${NC}" | tee -a "${RAW_OUTPUT}"
     result=$(parse_yaml ${YAML_FILE})
@@ -180,14 +254,17 @@ function main() {
     fi
   done < ${YAML_FILE}
 
-  test_array # validate the YAML file
+  if [ "${TESTING}" = true ]; then test_array; fi # validate the YAML file
 
   # example auth key: 2:9KD16LjLR_OSGlJKUAU0Mq3uSVu1k0K1pfLkNCZ9zLCkPl-Oe7m64WzQtXLswbcGVMyorgc_5CO3mO5w8FKx8g
   echo -e "${LGREEN}Generate auth key from Panorama CLI like so: ${LPURP}request bootstrap vm-auth-key generate lifetime 8760${NC}" | tee -a "${RAW_OUTPUT}"
   echo -e "${LGREEN}Enter your auth key: ${NC}"
   read -p ""
-echo ${fw_names[*]}
-  # add check to be sure subnets exist
+  # echo ${fw_names[*]}
+
+  # add check to be sure subnets exist in GCP
+
+  # add a check for DG and STK on Panorama
 
   for k in "${fw_names[@]}"; do
     echo -e "${YELLOW}Deploying firewall: ${k}${NC}" | tee -a "${RAW_OUTPUT}"
@@ -196,4 +273,4 @@ echo ${fw_names[*]}
   done
 }
 
-main "@"
+main "$@"
